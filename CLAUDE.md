@@ -1,71 +1,33 @@
 # CLAUDE.md
+## Project
+Micro SaaS MVP project for a Vibe Coding class. The product is 우리몫 (working title): a mobile web service that records the ownership shares and costs of a co-owned asset and ends the co-ownership by an agreed rule. Goal is a 4-week MVP that can be demoed.
+## Product Idea
+This app helps roommates and club members solve unclear ownership shares and cost-sharing for jointly bought items by recording each person's share and cost burden and simulating the settlement (sale / one member's buyout / disposal) when the co-ownership ends.
+## Tech Stack
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- Claude Code
+- GitHub
 
-**우리몫(가제)** — 공동소유 자산의 지분·비용을 기록하고, 합의된 규칙에 따라 공동소유를 종료(정산)하는 모바일 웹 서비스.
-
-## 프로젝트 개요
-
-- 상태: 초기 세팅 / 문서 작성 단계 (아직 애플리케이션 코드 없음)
-- 구현 목표: **4주 내 MVP 시연**
-- 핵심 원칙: 외부 시세·거래 API 없이 **사용자 입력값 + 사칙연산(+ − × ÷)** 만으로 동작
-- 상세 문서: [docs/PRD.md](docs/PRD.md) · [docs/DESIGN.md](docs/DESIGN.md) · [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
-
-## 예상 기술 스택 (안 — 확정 전)
-
-| 영역 | 선택(안) | 메모 |
-|---|---|---|
-| 프레임워크 | Next.js (App Router) + TypeScript | 모바일 웹, 파일 기반 라우팅 |
-| 스타일 | Tailwind CSS | DESIGN.md의 색·타이포 토큰을 theme에 매핑 |
-| 입력 검증 | zod | 폼·도메인 값 검증 |
-| 상태 | React 내장 (필요 시 Context) | 전역 상태 라이브러리 지양 |
-| 저장소 | 브라우저 localStorage | `lib/db` 계층으로 추상화, 이후 서버 전환 여지 |
-| 차트 | 자체 구현(막대·게이지) | 외부 차트 라이브러리 미사용 |
-| 테스트 | Vitest | `lib/calc` 순수 함수 커버리지 우선 |
-| 배포 | Vercel | |
-| 패키지 매니저 | pnpm | |
-
-MVP 범위 밖: 인증, 다기기 동기화, 실시간 협업, 푸시, 결제/이체, 외부 시세 연동, 다국어, 다크 모드.
-
-### 계산 규칙
-
-- 금액은 **KRW 정수(원)** 로 취급한다. 통화·퍼센트 포맷은 표시 계층에서만 적용.
-- 나눗셈에서 생기는 나머지(분배 잔액)는 버리지 않고 규칙적으로 배분한다 (소수부 큰 순 → 입력 순서, ARCHITECTURE.md의 `allocateByShare` 참조).
-- 모든 계산은 `lib/calc/`의 **순수 함수**로 구현하고 단위 테스트를 붙인다.
-- 화면에는 결과와 함께 **근거 식**을 표기한다. 예: `40% × 300,000 + (−12,000) = 108,000`.
-
-## 작업 규칙 (Claude Code와 협업 시)
-
-### 언어
-
-- 문서·커밋 메시지·주석·UI 카피: **한국어** 기본
-- 코드 식별자(변수/함수/타입/파일명): **영어**
-
-### 커밋 메시지 — Conventional Commits
-
-- 형식: `type: 한국어 요약` (요약 72자 이내)
-- type: `feat` `fix` `docs` `style` `refactor` `test` `chore`
-- 예: `feat: 지분 계산 로직 추가` / `fix: 지분 합계 반올림 오차 수정` / `docs: 정산 시나리오 예시 보강`
-- 본문(선택): 무엇을 · 왜. 관련 이슈는 하단에 참조.
-- Claude Code가 생성한 커밋은 `Co-Authored-By: Claude` 트레일러를 포함한다.
-
-### 브랜치 / 커밋 단위
-
-- `main` 직접 작업 지양. 기능은 `feat/<주제>`, 수정은 `fix/<주제>` 브랜치에서.
-- 예외: 초기 문서 세팅 커밋은 `main` 허용.
-- 커밋은 논리적 최소 단위. **문서 변경과 코드 변경은 분리**.
-
-### 코드 규칙
-
-- 계산 로직(지분·잔액·정산)을 바꾸면 `docs/ARCHITECTURE.md`의 데이터 모델·계산식을 **같은 커밋**에서 갱신한다.
-- 새 UI는 `docs/DESIGN.md`의 색·타이포·컴포넌트 규칙을 따른다. **색만으로 정보를 전달하지 않는다** (부호/아이콘 병행).
-- 파괴적 작업(파일 삭제, 스키마 변경, force push)은 사전 확인.
-- 비밀키·개인정보·실제 사용자 데이터는 커밋하지 않는다.
-- 도구 도입 후에는 커밋 전 `pnpm lint` + `pnpm test` 통과.
-
-### 문서 우선
-
-| 변경 성격 | 갱신할 문서 |
-|---|---|
-| 요구사항·범위 | `docs/PRD.md` |
-| 화면·비주얼·컴포넌트 | `docs/DESIGN.md` |
-| 폴더 구조·데이터 모델·계산식·화면 흐름 | `docs/ARCHITECTURE.md` |
-| 상세 설계 (API·스키마·모듈) | `docs/SDD.md` — *다음 회차 작성 예정* |
+MVP runs on user input and basic arithmetic only. No external price or transaction APIs. Data is stored locally in the browser.
+## Current Stage
+Session 1: project setup and context design. Filling CLAUDE / DESIGN / ARCHITECTURE / PRD with 우리몫 project content.
+## Working Rules
+- Read relevant files before suggesting changes.
+- Explain the plan before editing files.
+- Keep changes small.
+- Do not add unnecessary dependencies.
+- Update docs when project direction changes.
+- Summarize changed files before commit.
+## Boundaries
+Do not add:
+- payment
+- complex authentication
+- real-time collaboration
+- large file upload
+- multiple external API integrations
+## References
+- Follow docs/DESIGN.md for UI direction.
+- Follow docs/ARCHITECTURE.md for project structure.

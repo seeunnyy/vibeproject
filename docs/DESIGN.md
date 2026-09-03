@@ -1,110 +1,30 @@
-# DESIGN.md — 우리몫 (가제)
-
-> 관련: [PRD.md](./PRD.md) · [ARCHITECTURE.md](./ARCHITECTURE.md)
-
-## 1. 디자인 콘셉트
-
-**"신뢰할 수 있는 가벼움"** — 합의를 남기는 도구이므로 장부처럼 **정확하고 믿음직해야** 하지만, 회계 지식 없는 20~30대가 모바일에서 몇 초 안에 입력하는 도구이므로 **가벼워야** 한다.
-
-세 가지 키워드:
-
-| 키워드 | 의미 | 디자인 반영 |
-|---|---|---|
-| **명료함(Clarity)** | 숫자와 근거가 한눈에 보인다 | 큰 금액 타이포, 근거 식 병기, 표·막대 위주 |
-| **공정함(Fairness)** | 누구에게도 유리하지 않은 중립적 도구 | 채도 낮은 중립 팔레트, 참여자 색은 순환 지정(고정 서열 없음) |
-| **안심(Reassurance)** | 검증되고 되돌릴 수 있다 | 합계 100% 검증 배지, 파괴적 행동 2단계 확인, 결과 요약 공유 |
-
-레퍼런스 감각: 영수증·가계부의 신뢰감 + 국내 모바일 금융/중고거래 앱의 단순한 입력 흐름.
-
-## 2. 컬러
-
-의미 기반 토큰으로 정의한다. 값은 초안이며 구현 시 Tailwind `theme.extend.colors`로 매핑한다.
-
-### 브랜드 / 표면
-
-| 토큰 | HEX | 용도 |
-|---|---|---|
-| `brand` | `#1F7A5A` | 주요 액션, 로고, 활성 탭 (에버그린 — 균형·정산 연상) |
-| `brand-strong` | `#145C43` | 브랜드 눌림/강조 |
-| `brand-weak` | `#E4F1EC` | 브랜드 배경, 선택 칩 |
-| `bg` | `#FBFAF7` | 앱 배경 (따뜻한 오프화이트, 종이 느낌) |
-| `surface` | `#FFFFFF` | 카드·시트 |
-| `border` | `#E7E4DC` | 구분선·입력 테두리 |
-| `text` | `#1C1C1A` | 본문 |
-| `text-muted` | `#6B6B63` | 보조 설명·캡션 |
-
-### 의미 색 (정산 방향)
-
-| 토큰 | HEX | 용도 |
-|---|---|---|
-| `credit` | `#1F7A5A` | **받을 금액** (+) |
-| `debit` | `#E0603A` | **낼 금액 / 추가 지급** (−) |
-| `accent` | `#F5B841` | 주의·하이라이트 (요약 강조, 미확정 값) |
-| `danger` | `#C0392B` | 삭제·종료 확정 등 파괴적 행동 |
-
-> **접근성**: 색은 항상 부호(＋/－), 아이콘, 라벨과 함께 쓴다. `credit`/`debit`만으로 방향을 구분하지 않는다. 텍스트 대비는 WCAG AA(4.5:1) 이상.
-
-### 참여자 색 (순환)
-
-3~6명 구분용 파레트 — `#4C6EF5` `#12B886` `#F59F00` `#E64980` `#7048E8` `#15AABF`. 입력 순서대로 순환 배정하며 서열 의미 없음.
-
-## 3. 타이포그래피
-
-- **서체**: Pretendard (Variable) 우선, 폴백 `-apple-system, "Apple SD Gothic Neo", "Segoe UI", Roboto, sans-serif`.
-- **숫자**: `font-feature-settings: "tnum"` (tabular-nums)로 자릿수 정렬. 금액은 weight 600 이상.
-- **기준 크기**: 모바일 base 15px.
-
-| 역할 | 크기/행간 | Weight |
-|---|---|---|
-| Display (정산 결과 총액) | 28 / 36 | 700 |
-| H1 (화면 타이틀) | 22 / 30 | 700 |
-| H2 (섹션) | 18 / 26 | 600 |
-| Body | 15 / 22 | 400 |
-| Body strong / 금액 | 15 / 22 | 600 |
-| Caption (근거 식·라벨) | 13 / 18 | 400 |
-
-## 4. 레이아웃 · 기본 원칙
-
-- **모바일 세로 우선**, 최대 폭 480px 중앙 정렬(태블릿/데스크톱에서도 단일 컬럼 유지).
-- 한 화면 한 결정. 주요 액션은 하단 고정 버튼 또는 FAB.
-- 간격 스케일 4pt 기준 (`4 8 12 16 24 32`). 카드 radius 12, 버튼 radius 10.
-- 리스트 항목은 좌: 라벨 / 우: 금액·지분 정렬.
-- 계산 결과에는 항상 **근거 식**을 Caption으로 병기.
-
-## 5. 주요 화면
-
-| # | 화면 | 핵심 요소 |
-|---|---|---|
-| 1 | **홈 · 자산 목록** | 자산 카드 리스트(물건명, 참여자 수, 내 지분, 상태 배지), 빈 상태 안내, `+ 자산 추가` FAB |
-| 2 | **자산 생성 (스텝)** | ① 기본정보(이름·구매일·총액·분류) ② 참여자 추가 ③ 지분 방식: 납부액 입력 / 균등 ④ 확인 — 합계 100% 실시간 게이지 |
-| 3 | **자산 상세 · 지분 확인** | 상단 요약(총 구매액·현재 평가액·내 지분·예상 권리금액), 참여자별 지분 막대, 100% 검증 배지, 탭(지분 / 비용 / 종료규칙) |
-| 4 | **공동비용 기록** | 비용 리스트(날짜·항목·금액·부담자), 하단 시트로 비용 추가, 구성원별 **누적 부담액 vs 초기 지분** 대비표 |
-| 5 | **종료 규칙 합의** | 세그먼트(매각 / 인수 / 폐기), 방식별 입력(평가액 기준, 인수자 선택, 폐기비용/잔존가치), 합의 메모 |
-| 6 | **정산 시뮬레이션 · 결과** | 현재 평가액 입력 → 참여자별 결과 카드 `지분가치 + 잔액조정 = 최종 수취/지급액`, 받을 사람/낼 사람 색·아이콘 구분, 합계 검증, `요약 공유` |
-| 7 | **공유 요약 (읽기 전용)** | 자산 정보 + 합의 내용 + 최종 정산표. 스크린샷/링크 공유용, 편집 불가 |
-
-## 6. 핵심 컴포넌트
-
-| 컴포넌트 | 설명 |
-|---|---|
-| `AssetCard` | 목록의 자산 요약 카드 (상태 배지 포함) |
-| `StepIndicator` | 자산 생성 4단계 진행 표시 |
-| `ParticipantRow` | 참여자 1명 (이름·색·납부액·지분율) |
-| `ShareBar` | 참여자별 지분을 누적 막대로 시각화 |
-| `PercentGauge` | 지분 합계 100% 검증 게이지 (부족/초과/정상 상태) |
-| `MoneyText` | 금액 표시 — 부호·색·tabular-nums, 방향 아이콘 |
-| `FormulaCaption` | 계산 근거 식을 캡션으로 표기 |
-| `CostSheet` | 비용 추가 하단 시트 폼 |
-| `BalanceTable` | 구성원별 누적 부담액 대비 초기 지분 표 |
-| `ScenarioSegment` | 매각/인수/폐기 선택 세그먼트 컨트롤 |
-| `SettlementCard` | 참여자 1인의 정산 결과 (지분가치 + 잔액 = 최종액) |
-| `ShareSummary` | 공유용 읽기 전용 요약 블록 |
-| `ConfirmDialog` | 파괴적 행동 2단계 확인 |
-| `EmptyState` | 빈 목록 안내 |
-
-## 7. 톤 & 마이크로카피
-
-- 존댓말, 짧고 담백하게. "정산", "지분", "부담액" 등 용어는 일관되게 사용.
-- 숫자 옆에는 늘 단위(원 / %)를 붙인다.
-- 오류는 비난하지 않고 다음 행동을 안내한다. 예: *"지분 합계가 100%가 아니에요. 납부액을 다시 확인해 주세요."*
-- 미확정 값은 `accent` 색과 "예상" 라벨로 표시한다.
+# DESIGN.md
+## Design Goal
+A clean and simple mobile web app that lets roommates and club members record co-owned asset shares and costs and see a fair settlement without accounting knowledge. Every calculated amount shows how it was derived.
+## Visual Tone
+- Calm
+- Minimal
+- Easy to scan
+- Card-based when useful
+- Trustworthy and neutral, like a shared ledger (no participant looks privileged)
+## Main Screens
+- Landing Page
+  - One-line definition of 우리몫 and the problem it solves (unclear shares, disputes at move-out / graduation / club disband)
+  - Call to action to open the app
+- App Page
+  - Asset list and "add asset"
+  - Create asset: name, purchase date, total amount, participants, contributions or equal shares
+  - Asset detail: share %, contribution, expected payout, live check that shares sum to 100%
+  - Cost log: repair / extra purchase / shipping and who paid; cumulative burden shown separately from the initial share
+  - Termination rule: sale / one member's buyout / disposal, with valuation basis and settlement method
+  - Settlement result: enter current value, then each member's payout, the buyer's payment, and any shortfall or extra payment
+  - Shareable read-only summary of the calculations and agreements
+## UI Rules
+- Use clear button text.
+- Use labels for inputs.
+- Use semantic headings.
+- Avoid icon-only actions.
+- Avoid random design changes.
+- Show the formula behind every calculated amount.
+- Always show whether shares add up to 100%.
+- Use a sign or label, not color alone, to mark amounts to receive versus amounts to pay.
