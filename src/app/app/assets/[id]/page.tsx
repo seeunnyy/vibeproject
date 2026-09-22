@@ -31,8 +31,8 @@ export default function AssetDetailPage({ params }: { params: Promise<{ id: stri
       <>
         <AppHeader title="자산 상세" backHref="/app" />
         <main className="flex flex-1 flex-col items-center justify-center gap-3 px-4 py-10 text-center">
-          <p className="text-sm text-neutral-600">해당 자산을 찾을 수 없어요.</p>
-          <Link href="/app" className="text-sm text-neutral-700 underline">
+          <p className="text-sm text-text-muted">해당 자산을 찾을 수 없어요.</p>
+          <Link href="/app" className="text-sm text-primary-strong underline">
             목록으로 돌아가기
           </Link>
         </main>
@@ -71,19 +71,19 @@ export default function AssetDetailPage({ params }: { params: Promise<{ id: stri
       <AppHeader title={asset.name} backHref="/app" />
       <main className="flex flex-1 flex-col gap-5 px-4 py-6">
         <section className="flex flex-col gap-1">
-          {asset.purchaseDate && <p className="text-sm text-neutral-500">구매일: {asset.purchaseDate}</p>}
-          <p className="text-lg font-semibold">{won(asset.totalAmount)}</p>
+          {asset.purchaseDate && <p className="text-sm text-text-muted">구매일: {asset.purchaseDate}</p>}
+          <p className="text-lg font-semibold tabular-nums">{won(asset.totalAmount)}</p>
         </section>
 
         <ContributionCheckBadge check={contributionCheck} />
 
         <section className="flex flex-col gap-2">
-          <label htmlFor="manager-select" className="text-sm font-medium text-neutral-700">
+          <label htmlFor="manager-select" className="text-sm font-medium text-text">
             관리자
           </label>
           <select
             id="manager-select"
-            className="rounded-md border border-neutral-300 px-3 py-2 text-base"
+            className="min-h-11 rounded-xl border border-border bg-surface px-3 py-2 text-base text-text focus:ring-2 focus:ring-accent focus:outline-none"
             value={asset.managerId ?? ""}
             onChange={(e) => updateAsset(asset.id, { managerId: e.target.value || undefined })}
           >
@@ -95,28 +95,28 @@ export default function AssetDetailPage({ params }: { params: Promise<{ id: stri
             ))}
           </select>
           {manager ? (
-            <p className="text-xs text-neutral-500">현재 관리자: {manager.name}</p>
+            <p className="text-xs text-text-muted">현재 관리자: {manager.name}</p>
           ) : (
-            <p className="text-xs text-neutral-500">관리자 미지정</p>
+            <p className="text-xs text-text-muted">관리자 미지정</p>
           )}
         </section>
 
         {asset.agreementNote && (
           <section>
-            <h2 className="text-sm font-medium text-neutral-700">합의 메모</h2>
-            <p className="mt-1 whitespace-pre-wrap text-sm text-neutral-600">{asset.agreementNote}</p>
+            <h2 className="text-sm font-medium text-text">합의 메모</h2>
+            <p className="mt-1 whitespace-pre-wrap text-sm text-text-muted">{asset.agreementNote}</p>
           </section>
         )}
 
         <section>
-          <h2 className="mb-2 text-sm font-medium text-neutral-700">참여자별 지분·납부액·낸 비용</h2>
+          <h2 className="mb-2 text-sm font-medium text-text">참여자별 지분·납부액·낸 비용</h2>
           <MemberTable rows={rows} />
         </section>
 
         <section className="flex flex-col gap-2">
           <Link
             href={`/app/assets/${asset.id}/costs`}
-            className="rounded-md border border-neutral-300 px-4 py-2 text-center text-sm font-medium text-neutral-800"
+            className="flex min-h-11 items-center justify-center rounded-xl border border-border text-center text-sm font-medium text-text"
           >
             비용 기록
           </Link>
@@ -124,14 +124,14 @@ export default function AssetDetailPage({ params }: { params: Promise<{ id: stri
             type="button"
             disabled={!contributionCheck.ok}
             onClick={() => router.push(`/app/assets/${asset.id}/termination`)}
-            className="rounded-md border border-neutral-300 px-4 py-2 text-center text-sm font-medium text-neutral-800 disabled:opacity-40"
+            className="flex min-h-11 items-center justify-center rounded-xl border border-border text-center text-sm font-medium text-text disabled:opacity-40"
           >
             종료·정산
           </button>
           {blockedReason && <p className="text-xs text-amber-700">{blockedReason}</p>}
           <Link
             href={`/app/assets/${asset.id}/summary`}
-            className="rounded-md border border-neutral-300 px-4 py-2 text-center text-sm font-medium text-neutral-800"
+            className="flex min-h-11 items-center justify-center rounded-xl border border-border text-center text-sm font-medium text-text"
           >
             요약 보기
           </Link>

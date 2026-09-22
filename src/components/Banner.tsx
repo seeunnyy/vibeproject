@@ -10,10 +10,10 @@ export function Banner({ tone, message, action }: BannerProps) {
     tone === "error" ? "border-red-300 bg-red-50 text-red-800" : "border-amber-300 bg-amber-50 text-amber-800";
 
   return (
-    <div role="alert" className={`flex items-center justify-between gap-3 rounded-md border px-4 py-3 text-sm ${toneClass}`}>
+    <div role="alert" className={`flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-sm ${toneClass}`}>
       <span>{message}</span>
       {action && (
-        <button type="button" onClick={action.onClick} className="shrink-0 underline">
+        <button type="button" onClick={action.onClick} className="flex min-h-11 shrink-0 items-center px-2 underline">
           {action.label}
         </button>
       )}

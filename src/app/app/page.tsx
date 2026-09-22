@@ -39,21 +39,21 @@ export default function AssetListPage() {
             {assets.map((asset) => {
               const manager = asset.members.find((m) => m.id === asset.managerId);
               return (
-                <li key={asset.id} className="rounded-lg border border-neutral-200 p-4">
+                <li key={asset.id} className="rounded-2xl border border-border p-4">
                   <div className="flex items-start justify-between gap-3">
                     <Link href={`/app/assets/${asset.id}`} className="flex-1">
-                      <h2 className="font-semibold">{asset.name}</h2>
-                      <p className="mt-1 text-sm text-neutral-600">
+                      <h2 className="font-semibold text-text">{asset.name}</h2>
+                      <p className="mt-1 text-sm text-text-muted tabular-nums">
                         참여자 {asset.members.length}명 · 총 {won(asset.totalAmount)}
                       </p>
-                      <p className="mt-1 text-xs text-neutral-500">
+                      <p className="mt-1 text-xs text-text-muted">
                         관리자: {manager ? manager.name : "미지정"}
                       </p>
                     </Link>
                     <button
                       type="button"
                       onClick={() => handleDelete(asset.id, asset.name)}
-                      className="shrink-0 rounded-md px-2 py-1 text-xs text-neutral-500 hover:bg-neutral-100"
+                      className="flex min-h-11 shrink-0 items-center rounded-xl px-2 text-xs text-text-muted hover:bg-surface-muted"
                     >
                       삭제
                     </button>
@@ -67,7 +67,7 @@ export default function AssetListPage() {
         {assets.length > 0 && (
           <Link
             href="/app/assets/new"
-            className="self-center rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white"
+            className="flex min-h-11 items-center self-center rounded-xl bg-primary-strong px-4 text-sm font-medium text-white"
           >
             자산 추가
           </Link>

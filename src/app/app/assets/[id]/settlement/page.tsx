@@ -28,8 +28,8 @@ export default function SettlementPage({ params }: { params: Promise<{ id: strin
       <>
         <AppHeader title="정산" backHref="/app" />
         <main className="flex flex-1 flex-col items-center justify-center gap-3 px-4 py-10 text-center">
-          <p className="text-sm text-neutral-600">해당 자산을 찾을 수 없어요.</p>
-          <Link href="/app" className="text-sm text-neutral-700 underline">
+          <p className="text-sm text-text-muted">해당 자산을 찾을 수 없어요.</p>
+          <Link href="/app" className="text-sm text-primary-strong underline">
             목록으로 돌아가기
           </Link>
         </main>
@@ -52,7 +52,7 @@ export default function SettlementPage({ params }: { params: Promise<{ id: strin
         <AppHeader title="정산" backHref={`/app/assets/${asset.id}`} />
         <main className="flex flex-1 flex-col items-center justify-center gap-3 px-4 py-10 text-center">
           <p className="text-sm text-amber-700">납부액 합계가 총 구매금액과 달라 정산을 진행할 수 없어요.</p>
-          <Link href={`/app/assets/${asset.id}`} className="text-sm text-neutral-700 underline">
+          <Link href={`/app/assets/${asset.id}`} className="text-sm text-primary-strong underline">
             자산 상세에서 납부액 확인하기
           </Link>
         </main>
@@ -77,12 +77,12 @@ export default function SettlementPage({ params }: { params: Promise<{ id: strin
         {settlement ? (
           <SettlementResult result={settlement} members={asset.members} />
         ) : (
-          <p className="text-sm text-neutral-500">매각가를 입력하면 정산 결과가 표시됩니다.</p>
+          <p className="text-sm text-text-muted">매각가를 입력하면 정산 결과가 표시됩니다.</p>
         )}
 
         <Link
           href={`/app/assets/${asset.id}/summary`}
-          className="self-start text-sm text-neutral-700 underline"
+          className="self-start text-sm text-primary-strong underline"
         >
           요약 보기
         </Link>

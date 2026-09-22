@@ -1,24 +1,32 @@
 @import "tailwindcss";
 
+/* docs/DESIGN.md — Color Palette. 고정 브랜드 라이트 테마(시스템 다크모드에 맞춰 자동 전환하지 않음). */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-primary: #14213d;
+  --color-primary-strong: #1d4ed8;
+  --color-accent: #3b82f6;
+  --color-app-bg: #0f1b33;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f3f6fb;
+  --color-border: #e1e7f0;
+  --color-text: #0f172a;
+  --color-text-muted: #5b6478;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-primary: var(--color-primary);
+  --color-primary-strong: var(--color-primary-strong);
+  --color-accent: var(--color-accent);
+  --color-app-bg: var(--color-app-bg);
+  --color-surface: var(--color-surface);
+  --color-surface-muted: var(--color-surface-muted);
+  --color-border: var(--color-border);
+  --color-text: var(--color-text);
+  --color-text-muted: var(--color-text-muted);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-app-bg);
+  color: var(--color-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }

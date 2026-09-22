@@ -10,10 +10,13 @@ import Link from "next/link";
 
 export function EmptyState({ message, actionLabel, onAction, actionHref }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center gap-3 py-10 text-center">
-      <p className="text-sm text-neutral-600">{message}</p>
+    <div className="flex flex-col items-center gap-4 py-14 text-center">
+      <p className="text-sm text-text-muted">{message}</p>
       {actionLabel && actionHref && (
-        <Link href={actionHref} className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white">
+        <Link
+          href={actionHref}
+          className="flex min-h-11 items-center rounded-xl bg-primary-strong px-5 text-sm font-medium text-white"
+        >
           {actionLabel}
         </Link>
       )}
@@ -21,7 +24,7 @@ export function EmptyState({ message, actionLabel, onAction, actionHref }: Empty
         <button
           type="button"
           onClick={onAction}
-          className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white"
+          className="flex min-h-11 items-center rounded-xl bg-primary-strong px-5 text-sm font-medium text-white"
         >
           {actionLabel}
         </button>

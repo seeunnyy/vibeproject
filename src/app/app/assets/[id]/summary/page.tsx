@@ -39,8 +39,8 @@ export default function SummaryPage({ params }: { params: Promise<{ id: string }
       <>
         <AppHeader title="공유 요약" backHref="/app" />
         <main className="flex flex-1 flex-col items-center justify-center gap-3 px-4 py-10 text-center">
-          <p className="text-sm text-neutral-600">해당 자산을 찾을 수 없어요.</p>
-          <Link href="/app" className="text-sm text-neutral-700 underline">
+          <p className="text-sm text-text-muted">해당 자산을 찾을 수 없어요.</p>
+          <Link href="/app" className="text-sm text-primary-strong underline">
             목록으로 돌아가기
           </Link>
         </main>
@@ -87,32 +87,32 @@ export default function SummaryPage({ params }: { params: Promise<{ id: string }
       <AppHeader title="공유 요약" backHref={`/app/assets/${asset.id}`} />
       <main className="flex flex-1 flex-col gap-5 px-4 py-6">
         <section className="flex flex-col gap-1">
-          <h2 className="text-lg font-semibold">{asset.name}</h2>
-          {asset.purchaseDate && <p className="text-sm text-neutral-500">구매일: {asset.purchaseDate}</p>}
-          <p className="text-sm text-neutral-700">총 구매금액: {won(asset.totalAmount)}</p>
-          <p className="text-sm text-neutral-700">관리자: {manager ? manager.name : "미지정"}</p>
+          <h2 className="text-lg font-semibold text-text">{asset.name}</h2>
+          {asset.purchaseDate && <p className="text-sm text-text-muted">구매일: {asset.purchaseDate}</p>}
+          <p className="text-sm text-text tabular-nums">총 구매금액: {won(asset.totalAmount)}</p>
+          <p className="text-sm text-text">관리자: {manager ? manager.name : "미지정"}</p>
         </section>
 
         {asset.agreementNote && (
           <section>
-            <h3 className="text-sm font-medium text-neutral-700">합의 메모</h3>
-            <p className="mt-1 whitespace-pre-wrap text-sm text-neutral-600">{asset.agreementNote}</p>
+            <h3 className="text-sm font-medium text-text">합의 메모</h3>
+            <p className="mt-1 whitespace-pre-wrap text-sm text-text-muted">{asset.agreementNote}</p>
           </section>
         )}
 
         <section>
-          <h3 className="mb-2 text-sm font-medium text-neutral-700">참여자·지분·비용</h3>
+          <h3 className="mb-2 text-sm font-medium text-text">참여자·지분·비용</h3>
           <MemberTable rows={rows} />
         </section>
 
         <section>
-          <h3 className="mb-2 text-sm font-medium text-neutral-700">비용 내역</h3>
+          <h3 className="mb-2 text-sm font-medium text-text">비용 내역</h3>
           {asset.costs.length === 0 ? (
-            <p className="text-sm text-neutral-500">기록된 비용이 없습니다.</p>
+            <p className="text-sm text-text-muted">기록된 비용이 없습니다.</p>
           ) : (
-            <ul className="flex flex-col gap-1 text-sm text-neutral-600">
+            <ul className="flex flex-col gap-1 text-sm text-text-muted">
               {asset.costs.map((cost) => (
-                <li key={cost.id}>
+                <li key={cost.id} className="tabular-nums">
                   {cost.date} {COST_TYPE_LABEL[cost.type]} {won(cost.amount)} (부담자:{" "}
                   {asset.members.find((m) => m.id === cost.payerId)?.name ?? "알 수 없음"})
                 </li>
@@ -122,16 +122,16 @@ export default function SummaryPage({ params }: { params: Promise<{ id: string }
         </section>
 
         <section>
-          <h3 className="mb-2 text-sm font-medium text-neutral-700">종료·정산</h3>
-          <p className="text-sm text-neutral-600">종료 규칙: 매각</p>
-          {asset.terminationNote && <p className="mt-1 text-sm text-neutral-600">종료 합의 메모: {asset.terminationNote}</p>}
+          <h3 className="mb-2 text-sm font-medium text-text">종료·정산</h3>
+          <p className="text-sm text-text-muted">종료 규칙: 매각</p>
+          {asset.terminationNote && <p className="mt-1 text-sm text-text-muted">종료 합의 메모: {asset.terminationNote}</p>}
           {settlement ? (
             <div className="mt-2">
               <SettlementResult result={settlement} members={asset.members} />
             </div>
           ) : (
-            <p className="mt-2 text-sm text-neutral-500">
-              <Link href={`/app/assets/${asset.id}/settlement`} className="underline">
+            <p className="mt-2 text-sm text-text-muted">
+              <Link href={`/app/assets/${asset.id}/settlement`} className="text-primary-strong underline">
                 매각가를 입력하면 정산 결과가 표시됩니다
               </Link>
             </p>
@@ -141,7 +141,7 @@ export default function SummaryPage({ params }: { params: Promise<{ id: string }
         <button
           type="button"
           onClick={handleCopy}
-          className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white"
+          className="flex min-h-11 items-center justify-center rounded-xl bg-primary-strong px-4 text-sm font-medium text-white"
         >
           요약 복사
         </button>
