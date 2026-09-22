@@ -77,3 +77,13 @@ export interface ContributionCheck {
   diff: number;
   ok: boolean;
 }
+
+// OpenSpec change `add-asset-core-flow` — design.md Goal 1:
+// "04 §4 데이터 모델에 status 필드 1개만 추가하고 나머지 Asset 형태는 그대로 유지".
+// 공용 Asset은 건드리지 않고 OpenSpec 트랙 전용 확장으로 둔다(파일 상단 주석 참조).
+// 값 집합 근거: specs/asset-status/spec.md "Requirement: 상태값".
+export type AssetStatus = "draft" | "agreed" | "settled";
+
+export interface AssetWithStatus extends Asset {
+  status: AssetStatus;
+}
