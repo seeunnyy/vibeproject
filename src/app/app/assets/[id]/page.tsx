@@ -120,6 +120,12 @@ export default function AssetDetailPage({ params }: { params: Promise<{ id: stri
           >
             비용 기록
           </Link>
+          <Link
+            href={`/app/assets/${asset.id}/summary`}
+            className="flex min-h-11 items-center justify-center rounded-xl border border-border text-center text-sm font-medium text-text"
+          >
+            요약 보기
+          </Link>
           <button
             type="button"
             disabled={!contributionCheck.ok}
@@ -129,13 +135,14 @@ export default function AssetDetailPage({ params }: { params: Promise<{ id: stri
             종료·정산
           </button>
           {blockedReason && <p className="text-xs text-amber-700">{blockedReason}</p>}
-          <Link
-            href={`/app/assets/${asset.id}/summary`}
-            className="flex min-h-11 items-center justify-center rounded-xl border border-border text-center text-sm font-medium text-text"
-          >
-            요약 보기
-          </Link>
         </section>
+
+        <Link
+          href="/app"
+          className="mt-2 flex min-h-11 items-center justify-center text-sm font-medium text-text-muted underline underline-offset-2"
+        >
+          자산 목록으로 나가기
+        </Link>
       </main>
     </>
   );
