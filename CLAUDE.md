@@ -20,6 +20,15 @@ copyable summary. `Asset.status` (draft/agreed/settled) from the OpenSpec track 
 `Asset` type (`AssetWithStatus` kept as an alias for backward compatibility) but is not yet surfaced as a
 manual status/filter UI — that OpenSpec-track UI (asset-list filters, status transition buttons) was left
 out as out of scope for this pass; revisit if that track is picked back up.
+
+Session 6: added bottom tab-bar navigation (자산 목록 / 정산 현황 / 설정), decided with the user because
+the single flat list screen no longer covered a settlement overview or app settings. Implemented as a
+Next.js route group `src/app/app/(tabs)/` so the tab-bar top-level screens keep their existing URLs
+(`/app`) while adding two: `/app/settlements` (aggregate, view-only settlement status per asset — editing
+always routes into that asset's own S6 정산 화면, never inline) and `/app/settings` (data reset + app
+info). The tab bar (`src/components/TabBar.tsx`) only renders inside `(tabs)`, so the asset-detail
+drill-down (`assets/[id]` and its `costs/termination/settlement/summary` sub-routes) is unaffected and
+keeps its header back-button + "자산 목록으로 나가기" exit link as the only navigation there.
 ## Working Rules
 - Read relevant files before suggesting changes.
 - Explain the plan before editing files.
