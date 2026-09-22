@@ -13,7 +13,13 @@ This app helps roommates and club members solve unclear ownership shares and cos
 
 MVP runs on user input and basic arithmetic only. No external price or transaction APIs. Data is stored locally in the browser.
 ## Current Stage
-Session 1: project setup and context design. Filling CLAUDE / DESIGN / ARCHITECTURE / PRD with 우리몫 project content.
+Session 5: full MVP flow implemented per `planning/md-design/02~04` and `openspec/changes/add-asset-core-flow/specs/`.
+All 7 app screens (S1 자산 목록 ~ S7 공유 요약) are built: asset creation with contribution/equal split,
+share calculation, contribution validation, cost tracking, sale-only termination + settlement, and a
+copyable summary. `Asset.status` (draft/agreed/settled) from the OpenSpec track is now part of the core
+`Asset` type (`AssetWithStatus` kept as an alias for backward compatibility) but is not yet surfaced as a
+manual status/filter UI — that OpenSpec-track UI (asset-list filters, status transition buttons) was left
+out as out of scope for this pass; revisit if that track is picked back up.
 ## Working Rules
 - Read relevant files before suggesting changes.
 - Explain the plan before editing files.

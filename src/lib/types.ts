@@ -1,13 +1,15 @@
 // 도메인 타입 정의.
 // 출처: planning/md-design/04_TECHNICAL_DESIGN.md §4
-// 오늘(route/shell/type/placeholder 슬라이스)은 이 타입들을 정의만 하고 실제 로직에서는
-// 아직 사용하지 않는다. `Asset.status`(OpenSpec change `add-asset-core-flow`가 추가한 필드)는
-// 이 공통 타입에 포함하지 않는다 — MD 문서(04)에는 없는 필드이며, MD 기반 구현과 OpenSpec 기반
-// 구현을 비교하기 위해 각 트랙이 필요 시 별도로 확장한다.
+// MD-design 트랙과 OpenSpec 트랙(add-asset-core-flow)이 각자 실험하던 `Asset` / `AssetWithStatus`를
+// 여기서 하나로 합친다: 실제 서비스는 상태(status) 없이 존재할 이유가 없으므로 `status`를
+// `Asset` 본체 필드로 승격하고, `AssetWithStatus`는 기존 코드·테스트 호환을 위한 별칭으로 남긴다.
 
 export type SplitMode = "contribution" | "equal";
 
 export type CostType = "repair" | "purchase" | "shipping";
+
+// specs/asset-status/spec.md "Requirement: 상태값"
+export type AssetStatus = "draft" | "agreed" | "settled";
 
 export interface Member {
   id: string; // uuid
@@ -43,11 +45,28 @@ export interface Asset {
   costs: CostEntry[];
   termination: TerminationRule; // MVP: { kind: 'sale' } 고정
   salePrice?: number; // 매각가
+  status: AssetStatus;
   createdAt: string;
   updatedAt: string;
 }
 
-// 파생값 (저장하지 않음, 계산 결과) — 계산 함수는 오늘 범위 밖, 타입만 선언
+// 기존 OpenSpec 트랙 코드·테스트 호환용 별칭. 신규 코드는 `Asset`을 바로 쓴다.
+export type AssetWithStatus = Asset;
+
+// 자산 생성 입력 (폼 → reducer). id/createdAt/updatedAt/status는 reducer가 부여한다.
+// members는 폼에서만 의미 있는 임시 id(tempId)로 서로를 구분한다 — 동명이인이어도
+// managerTempId로 정확히 어느 참여자를 관리자로 지정했는지 알 수 있게 하기 위함이다.
+export interface CreateAssetInput {
+  name: string;
+  purchaseDate?: string;
+  totalAmount: number;
+  splitMode: SplitMode;
+  members: Array<{ tempId: string; name: string; contribution: number }>;
+  managerTempId?: string; // members 중 관리자로 지정할 참여자 (없으면 미지정)
+  agreementNote?: string;
+}
+
+// 파생값 (저장하지 않음, 계산 결과)
 export interface ShareRow {
   memberId: string;
   sharePct: number;
@@ -76,14 +95,4 @@ export interface ContributionCheck {
   target: number;
   diff: number;
   ok: boolean;
-}
-
-// OpenSpec change `add-asset-core-flow` — design.md Goal 1:
-// "04 §4 데이터 모델에 status 필드 1개만 추가하고 나머지 Asset 형태는 그대로 유지".
-// 공용 Asset은 건드리지 않고 OpenSpec 트랙 전용 확장으로 둔다(파일 상단 주석 참조).
-// 값 집합 근거: specs/asset-status/spec.md "Requirement: 상태값".
-export type AssetStatus = "draft" | "agreed" | "settled";
-
-export interface AssetWithStatus extends Asset {
-  status: AssetStatus;
 }
