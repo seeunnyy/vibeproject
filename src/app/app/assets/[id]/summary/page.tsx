@@ -28,7 +28,7 @@ export default function SummaryPage({ params }: { params: Promise<{ id: string }
 
   const shares = useMemo(() => (asset ? computeShares(asset) : []), [asset]);
   const contributionCheck = useMemo(
-    () => (asset ? checkContribution(asset) : { sum: 0, target: 0, diff: 0, ok: true }),
+    () => (asset ? checkContribution(asset) : { sum: 0, target: 0, diff: 0, ok: true, hasNegativeMember: false }),
     [asset],
   );
   const costTotals = useMemo(() => (asset ? sumCostsByPayer(asset) : []), [asset]);
@@ -84,7 +84,7 @@ export default function SummaryPage({ params }: { params: Promise<{ id: string }
 
   return (
     <>
-      <AppHeader title="공유 요약" backHref={`/app/assets/${asset.id}`} />
+      <AppHeader title="공유 요약" backHref={`/app/assets/${asset.id}`} closeHref="/app" />
       <main className="flex flex-1 flex-col gap-5 px-4 py-6">
         <section className="flex flex-col gap-1">
           <h2 className="text-lg font-semibold text-text">{asset.name}</h2>

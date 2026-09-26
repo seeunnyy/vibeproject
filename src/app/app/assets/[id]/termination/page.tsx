@@ -18,7 +18,7 @@ export default function TerminationPage({ params }: { params: Promise<{ id: stri
   const [saved, setSaved] = useState(false);
 
   const contributionCheck = useMemo(
-    () => (asset ? checkContribution(asset) : { sum: 0, target: 0, diff: 0, ok: true }),
+    () => (asset ? checkContribution(asset) : { sum: 0, target: 0, diff: 0, ok: true, hasNegativeMember: false }),
     [asset],
   );
 
@@ -48,7 +48,7 @@ export default function TerminationPage({ params }: { params: Promise<{ id: stri
   if (!contributionCheck.ok) {
     return (
       <>
-        <AppHeader title="종료 규칙" backHref={`/app/assets/${asset.id}`} />
+        <AppHeader title="종료 규칙" backHref={`/app/assets/${asset.id}`} closeHref="/app" />
         <main className="flex flex-1 flex-col items-center justify-center gap-3 px-4 py-10 text-center">
           <p className="text-sm text-amber-700">
             납부액 합계가 총 구매금액과 달라 종료 규칙을 진행할 수 없어요.
@@ -70,7 +70,7 @@ export default function TerminationPage({ params }: { params: Promise<{ id: stri
 
   return (
     <>
-      <AppHeader title="종료 규칙" backHref={`/app/assets/${asset.id}`} />
+      <AppHeader title="종료 규칙" backHref={`/app/assets/${asset.id}`} closeHref="/app" />
       <main className="flex flex-1 flex-col gap-5 px-4 py-6">
         <section className="flex flex-col gap-2">
           <div className="rounded-xl border border-primary-strong bg-primary-strong/5 p-3">

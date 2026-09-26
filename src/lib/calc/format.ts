@@ -22,3 +22,10 @@ export function percent(value: number): string {
 export function receiveLabel(amount: number): string {
   return `+ ${won(amount)} 받음`;
 }
+
+// 금액 입력 필드 공용 정제 함수. 숫자 이외의 모든 문자(부호 "-", ".", "e" 등)를 제거해
+// 음수·소수·지수 표기가 애초에 입력되지 않게 막는다.
+// 출처: docs/UX_IMPROVEMENT_PROPOSAL.md #1 — 토스의 "포맷으로 입력 자체를 제어" 원칙 적용.
+export function sanitizeDigits(raw: string): string {
+  return raw.replace(/[^0-9]/g, "");
+}

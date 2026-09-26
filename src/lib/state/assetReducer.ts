@@ -91,3 +91,44 @@ export function deleteCost(assets: Asset[], assetId: string, costId: string): As
       : asset,
   );
 }
+
+// 자산 생성 후 참여자 추가. 근거: docs/UX_IMPROVEMENT_PROPOSAL.md #4.
+// 이름·납부액은 추가 시점에 함께 받는다(추가 후 별도 수정 UI는 이번 범위에 없음 — 기존 참여자의
+// 납부액 수정 불가 문제는 이번 개선안의 대상이 아니었다).
+export function addMember(
+  assets: Asset[],
+  assetId: string,
+  input: { name: string; contribution: number },
+): Asset[] {
+  const now = new Date().toISOString();
+  return assets.map((asset) =>
+    asset.id === assetId
+      ? {
+          ...asset,
+          members: [
+            ...asset.members,
+            { id: generateId(), name: input.name.trim(), contribution: input.contribution },
+          ],
+          updatedAt: now,
+        }
+      : asset,
+  );
+}
+
+// 참여자 삭제. "최소 2명 유지"·"이미 비용을 낸 참여자는 삭제 금지" 같은 조건은 호출부(페이지)에서
+// 미리 걸러 이 함수까지 오지 않게 한다 — Splitwise의 "잔액이 남은 멤버는 삭제 금지" 가드레일과 같은
+// 취지(docs/UX_IMPROVEMENT_PROPOSAL.md #4). 이 함수 자체는 다른 reducer 함수들처럼 조건 없이
+// 순수하게 제거만 한다.
+export function removeMember(assets: Asset[], assetId: string, memberId: string): Asset[] {
+  const now = new Date().toISOString();
+  return assets.map((asset) =>
+    asset.id === assetId
+      ? {
+          ...asset,
+          members: asset.members.filter((m) => m.id !== memberId),
+          managerId: asset.managerId === memberId ? undefined : asset.managerId,
+          updatedAt: now,
+        }
+      : asset,
+  );
+}

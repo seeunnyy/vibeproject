@@ -18,7 +18,7 @@ export default function SettlementPage({ params }: { params: Promise<{ id: strin
   const asset = assets.find((a) => a.id === id);
 
   const contributionCheck = useMemo(
-    () => (asset ? checkContribution(asset) : { sum: 0, target: 0, diff: 0, ok: true }),
+    () => (asset ? checkContribution(asset) : { sum: 0, target: 0, diff: 0, ok: true, hasNegativeMember: false }),
     [asset],
   );
   const settlement = useMemo(() => (asset ? computeSaleSettlement(asset) : null), [asset]);
@@ -49,7 +49,7 @@ export default function SettlementPage({ params }: { params: Promise<{ id: strin
   if (!contributionCheck.ok) {
     return (
       <>
-        <AppHeader title="정산" backHref={`/app/assets/${asset.id}`} />
+        <AppHeader title="정산" backHref={`/app/assets/${asset.id}`} closeHref="/app" />
         <main className="flex flex-1 flex-col items-center justify-center gap-3 px-4 py-10 text-center">
           <p className="text-sm text-amber-700">납부액 합계가 총 구매금액과 달라 정산을 진행할 수 없어요.</p>
           <Link href={`/app/assets/${asset.id}`} className="text-sm text-primary-strong underline">
@@ -62,13 +62,13 @@ export default function SettlementPage({ params }: { params: Promise<{ id: strin
 
   return (
     <>
-      <AppHeader title="정산" backHref={`/app/assets/${asset.id}/termination`} />
+      <AppHeader title="정산" backHref={`/app/assets/${asset.id}/termination`} closeHref="/app" />
       <main className="flex flex-1 flex-col gap-5 px-4 py-6">
         <FormField label="매각가" htmlFor="sale-price" required>
           <NumberInput
             id="sale-price"
             value={asset.salePrice ?? ""}
-            onChange={(value) => updateAsset(asset.id, { salePrice: value })}
+            onChange={(value) => updateAsset(asset.id, { salePrice: value === "" ? undefined : value })}
             min={0}
             placeholder="1200000"
           />

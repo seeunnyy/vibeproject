@@ -9,6 +9,7 @@ import { ContributionCheckBadge } from "@/components/ContributionCheckBadge";
 import { FormulaText } from "@/components/FormulaText";
 import { useAssetStore } from "@/lib/state/AssetStoreProvider";
 import { checkContribution, computeShares } from "@/lib/calc/shares";
+import { sanitizeDigits } from "@/lib/calc/format";
 import type { Asset, SplitMode } from "@/lib/types";
 
 // S2 자산 생성 — 출처: planning/md-design/03_UX_UI_SPEC.md S2
@@ -80,7 +81,10 @@ export default function NewAssetPage() {
   const totalValid = numericTotal > 0;
   const contributionsFilled =
     splitMode === "equal" || members.every((m) => m.contribution.trim() !== "");
-  const contributionSumOk = splitMode === "equal" || contributionCheck.sum > 0;
+  // 종료·정산 단계와 동일한 기준(checkContribution.ok)을 그대로 재사용한다.
+  // 이전에는 "합계 > 0"만 확인해 생성 시점과 종료 시점의 검증 기준이 서로 달랐다
+  // (합계 불일치·개별 음수 납부액도 생성은 통과되던 문제) — docs/UX_IMPROVEMENT_PROPOSAL.md #2.
+  const contributionSumOk = splitMode === "equal" || contributionCheck.ok;
 
   const canSubmit =
     trimmedName.length > 0 && totalValid && hasEnoughMembers && contributionsFilled && contributionSumOk;
@@ -204,12 +208,14 @@ export default function NewAssetPage() {
                     </label>
                     <input
                       id={`member-contribution-${member.tempId}`}
-                      type="number"
+                      type="text"
                       inputMode="numeric"
                       min={0}
                       className="min-h-11 rounded-xl border border-border bg-surface px-3 py-2 text-base text-text focus:ring-2 focus:ring-accent focus:outline-none"
                       value={member.contribution}
-                      onChange={(e) => updateMember(member.tempId, { contribution: e.target.value })}
+                      onChange={(e) =>
+                        updateMember(member.tempId, { contribution: sanitizeDigits(e.target.value) })
+                      }
                       placeholder="납부액"
                     />
                   </div>

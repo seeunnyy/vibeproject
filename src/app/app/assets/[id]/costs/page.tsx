@@ -45,7 +45,7 @@ export default function CostsPage({ params }: { params: Promise<{ id: string }> 
 
   return (
     <>
-      <AppHeader title="비용 기록" backHref={`/app/assets/${asset.id}`} />
+      <AppHeader title="비용 기록" backHref={`/app/assets/${asset.id}`} closeHref="/app" />
       <main className="flex flex-1 flex-col gap-5 px-4 py-6">
         <CostForm members={asset.members} onAdd={(entry) => addCost(asset.id, entry)} />
 

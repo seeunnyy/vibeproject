@@ -4,6 +4,7 @@ import Link from "next/link";
 import { AppHeader } from "@/components/AppHeader";
 import { Banner } from "@/components/Banner";
 import { EmptyState } from "@/components/EmptyState";
+import { StatusBadge } from "@/components/StatusBadge";
 import { useAssetStore } from "@/lib/state/AssetStoreProvider";
 import { won } from "@/lib/calc/format";
 
@@ -41,8 +42,11 @@ export default function AssetListPage() {
               return (
                 <li key={asset.id} className="rounded-2xl border border-border p-4">
                   <div className="flex items-start justify-between gap-3">
-                    <Link href={`/app/assets/${asset.id}`} className="flex-1">
-                      <h2 className="font-semibold text-text">{asset.name}</h2>
+                    <Link href={`/app/assets/${asset.id}`} className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <h2 className="truncate font-semibold text-text">{asset.name}</h2>
+                        <StatusBadge asset={asset} />
+                      </div>
                       <p className="mt-1 text-sm text-text-muted tabular-nums">
                         참여자 {asset.members.length}명 · 총 {won(asset.totalAmount)}
                       </p>

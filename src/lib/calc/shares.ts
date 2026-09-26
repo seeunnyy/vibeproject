@@ -9,18 +9,26 @@ export function checkContribution(asset: Asset): ContributionCheck {
   // design.md D2: "draft→agreed 는 checkContribution(asset).ok (균등 모드는 항상 true)".
   // 균등 모드는 검증할 납부액 자체가 없으므로 항상 통과로 취급한다.
   if (asset.splitMode === "equal") {
-    return { sum: target, target, diff: 0, ok: true };
+    return { sum: target, target, diff: 0, ok: true, hasNegativeMember: false };
   }
 
   const sum = asset.members.reduce((total, member) => total + member.contribution, 0);
   const diff = target - sum;
 
-  // R-11: 납부액 합계가 0이면(전원 미입력/0) 지분 계산 불가 → 항상 실패.
-  if (sum === 0) {
-    return { sum, target, diff, ok: false };
+  // 개별 납부액이 음수면 지분도 음수로 계산된다. 합계만 우연히 총액과 맞아떨어져도(diff===0)
+  // 이 상태는 무조건 실패로 처리한다. 근거: docs/USABILITY_HEURISTIC_REVIEW.md #5(자가검진에서
+  // "1,300,000 / -400,000"이 "합계 일치"로 통과되던 사례를 실제 재현함).
+  const hasNegativeMember = asset.members.some((member) => member.contribution < 0);
+  if (hasNegativeMember) {
+    return { sum, target, diff, ok: false, hasNegativeMember: true };
   }
 
-  return { sum, target, diff, ok: diff === 0 };
+  // R-11: 납부액 합계가 0이면(전원 미입력/0) 지분 계산 불가 → 항상 실패.
+  if (sum === 0) {
+    return { sum, target, diff, ok: false, hasNegativeMember: false };
+  }
+
+  return { sum, target, diff, ok: diff === 0, hasNegativeMember: false };
 }
 
 // 근거: specs/asset-registration/spec.md "Requirement: 지분율 자동 산출"

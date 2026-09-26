@@ -6,9 +6,11 @@ import { clear as clearStorage, load, save } from "@/lib/storage/assetStore";
 import {
   addAsset,
   addCost as addCostToAssets,
+  addMember as addMemberToAsset,
   buildAssetFromInput,
   deleteAsset as deleteAssetFromList,
   deleteCost as deleteCostFromAssets,
+  removeMember as removeMemberFromAsset,
   updateAsset as updateAssetInList,
 } from "@/lib/state/assetReducer";
 
@@ -28,6 +30,8 @@ type StoreAction =
   | { type: "updateAsset"; id: string; patch: Partial<Asset> }
   | { type: "addCost"; assetId: string; entry: Omit<CostEntry, "id"> }
   | { type: "deleteCost"; assetId: string; costId: string }
+  | { type: "addMember"; assetId: string; input: { name: string; contribution: number } }
+  | { type: "removeMember"; assetId: string; memberId: string }
   | { type: "saveFailed" }
   | { type: "reset" };
 
@@ -45,6 +49,10 @@ function storeReducer(state: StoreState, action: StoreAction): StoreState {
       return { ...state, assets: addCostToAssets(state.assets, action.assetId, action.entry) };
     case "deleteCost":
       return { ...state, assets: deleteCostFromAssets(state.assets, action.assetId, action.costId) };
+    case "addMember":
+      return { ...state, assets: addMemberToAsset(state.assets, action.assetId, action.input) };
+    case "removeMember":
+      return { ...state, assets: removeMemberFromAsset(state.assets, action.assetId, action.memberId) };
     case "saveFailed":
       return { ...state, saveError: true };
     case "reset":
@@ -60,6 +68,8 @@ interface AssetStoreContextValue extends StoreState {
   updateAsset: (id: string, patch: Partial<Asset>) => void;
   addCost: (assetId: string, entry: Omit<CostEntry, "id">) => void;
   deleteCost: (assetId: string, costId: string) => void;
+  addMember: (assetId: string, input: { name: string; contribution: number }) => void;
+  removeMember: (assetId: string, memberId: string) => void;
   resetStore: () => void;
 }
 
@@ -108,6 +118,14 @@ export function AssetStoreProvider({ children }: { children: React.ReactNode }) 
     dispatch({ type: "deleteCost", assetId, costId });
   }, []);
 
+  const addMember = useCallback((assetId: string, input: { name: string; contribution: number }) => {
+    dispatch({ type: "addMember", assetId, input });
+  }, []);
+
+  const removeMember = useCallback((assetId: string, memberId: string) => {
+    dispatch({ type: "removeMember", assetId, memberId });
+  }, []);
+
   const resetStore = useCallback(() => {
     clearStorage();
     dispatch({ type: "reset" });
@@ -121,9 +139,11 @@ export function AssetStoreProvider({ children }: { children: React.ReactNode }) 
       updateAsset,
       addCost,
       deleteCost,
+      addMember,
+      removeMember,
       resetStore,
     }),
-    [state, createAsset, deleteAsset, updateAsset, addCost, deleteCost, resetStore],
+    [state, createAsset, deleteAsset, updateAsset, addCost, deleteCost, addMember, removeMember, resetStore],
   );
 
   return <AssetStoreContext.Provider value={value}>{children}</AssetStoreContext.Provider>;

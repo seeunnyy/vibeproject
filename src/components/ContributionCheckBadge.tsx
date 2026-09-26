@@ -4,6 +4,14 @@ import { won } from "@/lib/calc/format";
 // 출처: 03_UX_UI_SPEC.md §4 — ContributionCheckBadge
 // 근거: FR-3, R-9. "납부액 합계 = 총 구매금액" 여부를 항상 텍스트로 표시(색만 쓰지 않음).
 export function ContributionCheckBadge({ check }: { check: ContributionCheck }) {
+  if (check.hasNegativeMember) {
+    return (
+      <p role="alert" className="flex items-center gap-1.5 rounded-xl bg-red-50 px-3 py-2.5 text-sm text-red-800">
+        <span aria-hidden="true">⚠</span> 참여자 납부액에 음수가 있어요. 납부액을 다시 확인해 주세요
+      </p>
+    );
+  }
+
   if (check.ok) {
     return (
       <p className="flex items-center gap-1.5 rounded-xl bg-green-50 px-3 py-2.5 text-sm text-green-800">

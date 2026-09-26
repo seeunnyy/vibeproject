@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { AppHeader } from "@/components/AppHeader";
 import { EmptyState } from "@/components/EmptyState";
+import { StatusBadge } from "@/components/StatusBadge";
 import { useAssetStore } from "@/lib/state/AssetStoreProvider";
 import { checkContribution } from "@/lib/calc/shares";
 import { computeSaleSettlement } from "@/lib/calc/settlement";
@@ -40,19 +41,7 @@ export default function SettlementsOverviewPage() {
                         참여자 {asset.members.length}명 · 총 {won(asset.totalAmount)}
                       </p>
                     </div>
-                    {blocked ? (
-                      <span className="shrink-0 rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-700">
-                        납부액 확인 필요
-                      </span>
-                    ) : settlement ? (
-                      <span className="shrink-0 rounded-full bg-primary-strong/10 px-2 py-1 text-xs font-medium text-primary-strong">
-                        정산 완료
-                      </span>
-                    ) : (
-                      <span className="shrink-0 rounded-full bg-surface-muted px-2 py-1 text-xs font-medium text-text-muted">
-                        정산 전
-                      </span>
-                    )}
+                    <StatusBadge asset={asset} />
                   </div>
 
                   {settlement && (

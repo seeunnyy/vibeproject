@@ -95,4 +95,7 @@ export interface ContributionCheck {
   target: number;
   diff: number;
   ok: boolean;
+  // 참여자 개별 납부액에 음수가 있는지. 합계가 총액과 맞아떨어져도(diff===0) 이 값이 true면 ok는
+  // 무조건 false — 근거: docs/USABILITY_HEURISTIC_REVIEW.md #5.
+  hasNegativeMember: boolean;
 }
