@@ -58,6 +58,15 @@ then implemented the fixes:
 
 전체 변경은 `vitest run`(40 tests) 및 `tsc --noEmit`/`eslint` 클린, Playwright로 실제 개발 서버에서
 음수 입력 차단·검증 통일·나가기 버튼·참여자 관리 UI를 재확인 완료. 세부 근거는 위 두 문서 참고.
+
+Session 8: 카드 과다 사용 정리(기능 변경 없음). 자산 목록·정산 현황·비용 목록·참여자 관리·종료 방식의
+반복 카드를 "테두리 1개 + 구분선" 그룹으로 통합, 자산 상세 이동 버튼 3개를 하나의 메뉴 그룹으로, 설정 탭 통계
+카드 3장을 배경 그룹 1개로, 안내성 섹션은 카드 없이 제목·여백으로 정리. 자산 상세·생성·비용 화면에 섹션 제목을
+추가해 section → group → item 계층을 드러냄. 규칙은 `docs/DESIGN.md` "카드 사용 원칙" 참고.
+이어서 "AI 생성 UI처럼 보이는 패턴" 정리: 탭바 이모지 → SVG 라인 아이콘, StatusBadge·관리자 pill → 텍스트
+상태, 정상 상태 초록 박스 → 텍스트, 설정 통계 타일 → 중립색 통계 행, 라운드 한 단계 축소, 랜딩 왼쪽 정렬 재구성.
+규칙은 `docs/DESIGN.md` "장식 요소 원칙" 참고.
+
 ## Working Rules
 - Read relevant files before suggesting changes.
 - Explain the plan before editing files.

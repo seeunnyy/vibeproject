@@ -71,22 +71,24 @@ export default function TerminationPage({ params }: { params: Promise<{ id: stri
   return (
     <>
       <AppHeader title="종료 규칙" backHref={`/app/assets/${asset.id}`} closeHref="/app" />
-      <main className="flex flex-1 flex-col gap-5 px-4 py-6">
-        <section className="flex flex-col gap-2">
-          <div className="rounded-xl border border-primary-strong bg-primary-strong/5 p-3">
-            <p className="text-sm font-medium text-text">매각 (선택됨)</p>
-            <p className="mt-1 text-xs text-text-muted">매각가를 입력하면 지분율대로 나눕니다.</p>
-          </div>
-          <div className="flex flex-col gap-2 opacity-50">
-            <div className="flex items-center justify-between rounded-xl border border-border p-3">
+      <main className="flex flex-1 flex-col gap-8 px-4 py-6">
+        {/* 종료 방식 3개는 하나의 선택지 그룹 — 옵션마다 카드를 만들지 않고 테두리 1개 안에서 구분선으로 나눈다. */}
+        <section className="flex flex-col gap-3">
+          <h2 className="text-base font-semibold text-text">종료 방식</h2>
+          <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border">
+            <li className="border-l-4 border-l-primary-strong bg-primary-strong/5 px-4 py-3">
+              <p className="text-sm font-medium text-text">매각 (선택됨)</p>
+              <p className="mt-1 text-xs text-text-muted">매각가를 입력하면 지분율대로 나눕니다.</p>
+            </li>
+            <li className="flex items-center justify-between px-4 py-3 opacity-50">
               <span className="text-sm text-text">한 명의 인수</span>
-              <span className="rounded-full bg-surface-muted px-2 py-0.5 text-xs text-text-muted">다음 버전에서 제공</span>
-            </div>
-            <div className="flex items-center justify-between rounded-xl border border-border p-3">
+              <span className="text-xs text-text-muted">다음 버전에서 제공</span>
+            </li>
+            <li className="flex items-center justify-between px-4 py-3 opacity-50">
               <span className="text-sm text-text">폐기</span>
-              <span className="rounded-full bg-surface-muted px-2 py-0.5 text-xs text-text-muted">다음 버전에서 제공</span>
-            </div>
-          </div>
+              <span className="text-xs text-text-muted">다음 버전에서 제공</span>
+            </li>
+          </ul>
         </section>
 
         <label htmlFor="termination-note" className="flex flex-col gap-1 text-sm font-medium text-text">
@@ -94,7 +96,7 @@ export default function TerminationPage({ params }: { params: Promise<{ id: stri
           <span className="text-xs font-normal text-text-muted">평가액 산정 기준·특약 등을 자유롭게 적어 주세요 (선택)</span>
           <textarea
             id="termination-note"
-            className="min-h-24 rounded-xl border border-border bg-surface px-3 py-2 text-base font-normal text-text focus:ring-2 focus:ring-accent focus:outline-none"
+            className="min-h-24 rounded-lg border border-border bg-surface px-3 py-2 text-base font-normal text-text focus:ring-2 focus:ring-accent focus:outline-none"
             value={note}
             onChange={(e) => setNote(e.target.value)}
           />
@@ -103,7 +105,7 @@ export default function TerminationPage({ params }: { params: Promise<{ id: stri
         <button
           type="button"
           onClick={handleSave}
-          className="flex min-h-11 items-center justify-center rounded-xl bg-primary-strong px-4 text-sm font-medium text-white"
+          className="flex min-h-11 items-center justify-center rounded-lg bg-primary-strong px-4 text-sm font-medium text-white"
         >
           저장하고 정산으로 이동
         </button>

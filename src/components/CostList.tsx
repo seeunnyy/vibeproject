@@ -26,12 +26,10 @@ export function CostList({ entries, members, onDelete }: CostListProps) {
   }
 
   return (
-    <ul className="flex flex-col gap-2">
+    // 내역마다 독립 카드를 두지 않고 하나의 그룹 안에서 구분선으로 나눈다(docs/DESIGN.md 카드 사용 원칙).
+    <ul className="divide-y divide-border rounded-xl border border-border">
       {entries.map((entry) => (
-        <li
-          key={entry.id}
-          className="flex items-center justify-between gap-3 rounded-xl border border-border px-3 py-2.5 text-sm"
-        >
+        <li key={entry.id} className="flex items-center justify-between gap-3 py-2 pr-2 pl-4 text-sm">
           <div>
             <p className="tabular-nums">
               {COST_TYPE_LABEL[entry.type]} · {won(entry.amount)}
@@ -44,7 +42,7 @@ export function CostList({ entries, members, onDelete }: CostListProps) {
           <button
             type="button"
             onClick={() => handleDelete(entry.id)}
-            className="flex min-h-11 shrink-0 items-center rounded-xl px-2 text-xs text-text-muted hover:bg-surface-muted"
+            className="flex min-h-11 shrink-0 items-center rounded-lg px-2 text-xs text-text-muted hover:bg-surface-muted"
           >
             삭제
           </button>

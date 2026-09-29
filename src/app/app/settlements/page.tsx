@@ -25,7 +25,9 @@ export default function SettlementsOverviewPage() {
         )}
 
         {assets.length > 0 && (
-          <ul className="flex flex-col gap-3">
+          // 자산별 카드를 반복하지 않고 하나의 그룹 안에서 구분선으로 나눈다. 항목 안의 이동 액션도
+          // 테두리 버튼(카드 속 카드) 대신 텍스트 링크로 둔다.
+          <ul className="divide-y divide-border rounded-xl border border-border">
             {assets.map((asset) => {
               const contributionCheck = checkContribution(asset);
               const blocked = !contributionCheck.ok;
@@ -33,7 +35,7 @@ export default function SettlementsOverviewPage() {
               const receiveTotal = settlement?.rows.reduce((sum, row) => sum + row.receive, 0) ?? 0;
 
               return (
-                <li key={asset.id} className="rounded-2xl border border-border p-4">
+                <li key={asset.id} className="flex flex-col px-4 pt-4 pb-1">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <h2 className="truncate font-semibold text-text">{asset.name}</h2>
@@ -52,9 +54,10 @@ export default function SettlementsOverviewPage() {
 
                   <Link
                     href={blocked ? `/app/assets/${asset.id}` : `/app/assets/${asset.id}/settlement`}
-                    className="mt-3 flex min-h-11 items-center justify-center rounded-xl border border-border text-center text-sm font-medium text-text"
+                    className="flex min-h-11 items-center self-end text-sm font-medium text-primary-strong"
                   >
                     {blocked ? "자산 상세에서 확인하기" : settlement ? "정산 내역 수정" : "정산하기"}
+                    <span aria-hidden="true" className="ml-1">›</span>
                   </Link>
                 </li>
               );

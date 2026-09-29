@@ -6,7 +6,7 @@ import { won } from "@/lib/calc/format";
 export function ContributionCheckBadge({ check }: { check: ContributionCheck }) {
   if (check.hasNegativeMember) {
     return (
-      <p role="alert" className="flex items-center gap-1.5 rounded-xl bg-red-50 px-3 py-2.5 text-sm text-red-800">
+      <p role="alert" className="flex items-center gap-1.5 rounded-lg bg-red-50 px-3 py-2.5 text-sm text-red-800">
         <span aria-hidden="true">⚠</span> 참여자 납부액에 음수가 있어요. 납부액을 다시 확인해 주세요
       </p>
     );
@@ -14,7 +14,8 @@ export function ContributionCheckBadge({ check }: { check: ContributionCheck }) 
 
   if (check.ok) {
     return (
-      <p className="flex items-center gap-1.5 rounded-xl bg-green-50 px-3 py-2.5 text-sm text-green-800">
+      // 정상 상태는 배경 박스 없이 조용한 텍스트로 — 박스는 조치가 필요한 경고·오류에만 써서 눈에 띄게 한다.
+      <p className="flex items-center gap-1.5 text-sm text-green-800">
         <span aria-hidden="true">✓</span> 납부액 합계가 총 구매금액과 일치합니다
       </p>
     );
@@ -22,7 +23,7 @@ export function ContributionCheckBadge({ check }: { check: ContributionCheck }) 
 
   if (check.sum === 0) {
     return (
-      <p role="alert" className="flex items-center gap-1.5 rounded-xl bg-red-50 px-3 py-2.5 text-sm text-red-800">
+      <p role="alert" className="flex items-center gap-1.5 rounded-lg bg-red-50 px-3 py-2.5 text-sm text-red-800">
         <span aria-hidden="true">⚠</span> 납부액 합계가 0이라 지분을 계산할 수 없습니다
       </p>
     );
@@ -31,7 +32,7 @@ export function ContributionCheckBadge({ check }: { check: ContributionCheck }) 
   const diffLabel = check.diff > 0 ? `${won(check.diff)} 적습니다` : `${won(Math.abs(check.diff))} 많습니다`;
 
   return (
-    <p role="alert" className="flex items-center gap-1.5 rounded-xl bg-amber-50 px-3 py-2.5 text-sm text-amber-800">
+    <p role="alert" className="flex items-center gap-1.5 rounded-lg bg-amber-50 px-3 py-2.5 text-sm text-amber-800">
       <span aria-hidden="true">⚠</span> 총 구매금액보다 {diffLabel} (현재 합계 {won(check.sum)})
     </p>
   );

@@ -129,173 +129,188 @@ export default function NewAssetPage() {
     <>
       <AppHeader title="자산 만들기" backHref="/app" />
       <main className="flex flex-1 flex-col gap-6 px-4 py-6">
-        <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
-          <FormField label="물건명" htmlFor="asset-name" required>
-            <input
-              id="asset-name"
-              className="min-h-11 rounded-xl border border-border bg-surface px-3 py-2 text-base text-text focus:ring-2 focus:ring-accent focus:outline-none"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="예: 공용 냉장고"
-            />
-          </FormField>
+        {/* 필드를 나열만 하지 않고 기본 정보 / 참여자와 지분 / 추가 정보 세 섹션으로 묶는다. */}
+        <form className="flex flex-col gap-8" onSubmit={handleSubmit}>
+          <section className="flex flex-col gap-5">
+            <h2 className="text-base font-semibold text-text">기본 정보</h2>
+            <FormField label="물건명" htmlFor="asset-name" required>
+              <input
+                id="asset-name"
+                className="min-h-11 rounded-lg border border-border bg-surface px-3 py-2 text-base text-text focus:ring-2 focus:ring-accent focus:outline-none"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="예: 공용 냉장고"
+              />
+            </FormField>
 
-          <FormField label="구매일" htmlFor="asset-purchase-date">
-            <input
-              id="asset-purchase-date"
-              type="date"
-              className="min-h-11 rounded-xl border border-border bg-surface px-3 py-2 text-base text-text focus:ring-2 focus:ring-accent focus:outline-none"
-              value={purchaseDate}
-              onChange={(e) => setPurchaseDate(e.target.value)}
-            />
-          </FormField>
+            <FormField label="구매일" htmlFor="asset-purchase-date">
+              <input
+                id="asset-purchase-date"
+                type="date"
+                className="min-h-11 rounded-lg border border-border bg-surface px-3 py-2 text-base text-text focus:ring-2 focus:ring-accent focus:outline-none"
+                value={purchaseDate}
+                onChange={(e) => setPurchaseDate(e.target.value)}
+              />
+            </FormField>
 
-          <FormField
-            label="총 구매금액"
-            htmlFor="asset-total"
-            required
-            error={totalAmount !== "" && !totalValid ? "0보다 큰 금액을 입력해 주세요" : undefined}
-          >
-            <NumberInput id="asset-total" value={totalAmount} onChange={setTotalAmount} min={0} placeholder="900000" />
-          </FormField>
+            <FormField
+              label="총 구매금액"
+              htmlFor="asset-total"
+              required
+              error={totalAmount !== "" && !totalValid ? "0보다 큰 금액을 입력해 주세요" : undefined}
+            >
+              <NumberInput id="asset-total" value={totalAmount} onChange={setTotalAmount} min={0} placeholder="900000" />
+            </FormField>
+          </section>
 
-          <fieldset className="flex flex-col gap-2">
-            <legend className="text-sm font-medium text-text">분배 방식</legend>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setSplitMode("contribution")}
-                aria-pressed={splitMode === "contribution"}
-                className={`flex min-h-11 items-center rounded-xl border px-3 text-sm ${
-                  splitMode === "contribution" ? "border-primary-strong bg-primary-strong text-white" : "border-border text-text"
-                }`}
-              >
-                납부액 입력
-              </button>
-              <button
-                type="button"
-                onClick={() => setSplitMode("equal")}
-                aria-pressed={splitMode === "equal"}
-                className={`flex min-h-11 items-center rounded-xl border px-3 text-sm ${
-                  splitMode === "equal" ? "border-primary-strong bg-primary-strong text-white" : "border-border text-text"
-                }`}
-              >
-                균등 분할
-              </button>
-            </div>
-          </fieldset>
-
-          <fieldset className="flex flex-col gap-3">
-            <legend className="text-sm font-medium text-text">참여자 (최소 2명) *</legend>
-            {members.map((member, index) => (
-              <div key={member.tempId} className="flex items-start gap-2">
-                <div className="flex flex-1 flex-col gap-1">
-                  <label htmlFor={`member-name-${member.tempId}`} className="sr-only">
-                    참여자 {index + 1} 이름
-                  </label>
-                  <input
-                    id={`member-name-${member.tempId}`}
-                    className="min-h-11 rounded-xl border border-border bg-surface px-3 py-2 text-base text-text focus:ring-2 focus:ring-accent focus:outline-none"
-                    value={member.name}
-                    onChange={(e) => updateMember(member.tempId, { name: e.target.value })}
-                    placeholder={`참여자 ${index + 1} 이름`}
-                  />
-                </div>
-                {splitMode === "contribution" && (
-                  <div className="flex w-32 flex-col gap-1">
-                    <label htmlFor={`member-contribution-${member.tempId}`} className="sr-only">
-                      {member.name || `참여자 ${index + 1}`} 납부액
-                    </label>
-                    <input
-                      id={`member-contribution-${member.tempId}`}
-                      type="text"
-                      inputMode="numeric"
-                      min={0}
-                      className="min-h-11 rounded-xl border border-border bg-surface px-3 py-2 text-base text-text focus:ring-2 focus:ring-accent focus:outline-none"
-                      value={member.contribution}
-                      onChange={(e) =>
-                        updateMember(member.tempId, { contribution: sanitizeDigits(e.target.value) })
-                      }
-                      placeholder="납부액"
-                    />
-                  </div>
-                )}
+          <section className="flex flex-col gap-5">
+            <h2 className="text-base font-semibold text-text">참여자와 지분</h2>
+            <fieldset className="flex flex-col gap-2">
+              <legend className="text-sm font-medium text-text">분배 방식</legend>
+              <div className="flex gap-2">
                 <button
                   type="button"
-                  onClick={() => removeMember(member.tempId)}
-                  disabled={members.length <= 2}
-                  className="mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-xs text-text-muted hover:bg-surface-muted disabled:opacity-30"
+                  onClick={() => setSplitMode("contribution")}
+                  aria-pressed={splitMode === "contribution"}
+                  className={`flex min-h-11 items-center rounded-lg border px-3 text-sm ${
+                    splitMode === "contribution" ? "border-primary-strong bg-primary-strong text-white" : "border-border text-text"
+                  }`}
                 >
-                  삭제
+                  납부액 입력
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSplitMode("equal")}
+                  aria-pressed={splitMode === "equal"}
+                  className={`flex min-h-11 items-center rounded-lg border px-3 text-sm ${
+                    splitMode === "equal" ? "border-primary-strong bg-primary-strong text-white" : "border-border text-text"
+                  }`}
+                >
+                  균등 분할
                 </button>
               </div>
-            ))}
+            </fieldset>
+
+            <fieldset className="flex flex-col gap-3">
+              <legend className="text-sm font-medium text-text">참여자 (최소 2명) *</legend>
+              {members.map((member, index) => (
+                <div key={member.tempId} className="flex items-start gap-2">
+                  <div className="flex flex-1 flex-col gap-1">
+                    <label htmlFor={`member-name-${member.tempId}`} className="sr-only">
+                      참여자 {index + 1} 이름
+                    </label>
+                    <input
+                      id={`member-name-${member.tempId}`}
+                      className="min-h-11 rounded-lg border border-border bg-surface px-3 py-2 text-base text-text focus:ring-2 focus:ring-accent focus:outline-none"
+                      value={member.name}
+                      onChange={(e) => updateMember(member.tempId, { name: e.target.value })}
+                      placeholder={`참여자 ${index + 1} 이름`}
+                    />
+                  </div>
+                  {splitMode === "contribution" && (
+                    <div className="flex w-32 flex-col gap-1">
+                      <label htmlFor={`member-contribution-${member.tempId}`} className="sr-only">
+                        {member.name || `참여자 ${index + 1}`} 납부액
+                      </label>
+                      <input
+                        id={`member-contribution-${member.tempId}`}
+                        type="text"
+                        inputMode="numeric"
+                        min={0}
+                        className="min-h-11 rounded-lg border border-border bg-surface px-3 py-2 text-base text-text focus:ring-2 focus:ring-accent focus:outline-none"
+                        value={member.contribution}
+                        onChange={(e) =>
+                          updateMember(member.tempId, { contribution: sanitizeDigits(e.target.value) })
+                        }
+                        placeholder="납부액"
+                      />
+                    </div>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => removeMember(member.tempId)}
+                    disabled={members.length <= 2}
+                    className="mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-xs text-text-muted hover:bg-surface-muted disabled:opacity-30"
+                  >
+                    삭제
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={addMember}
+                className="flex min-h-11 items-center self-start rounded-lg border border-border px-3 text-sm text-text"
+              >
+                참여자 추가
+              </button>
+            </fieldset>
+
+            {shares.length > 0 && (splitMode === "equal" || shares.some((s) => s.sharePct > 0)) && (
+              // 미리보기는 배경만 쓰고(테두리 없음), 검증 배지는 박스 안에 중첩하지 않고 바로 아래에 둔다.
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-1 rounded-xl bg-surface-muted p-4">
+                  <p className="text-sm font-medium text-text">지분 미리보기</p>
+                  <ul className="flex flex-col gap-1 text-sm text-text-muted">
+                    {shares.map((share) => {
+                      const member = members.find((m) => m.tempId === share.memberId);
+                      return (
+                        <li key={share.memberId} className="tabular-nums">
+                          {member?.name || "(이름 없음)"}: {share.sharePct.toFixed(1)}% <FormulaText expr={share.formula} />
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+                {splitMode === "contribution" && <ContributionCheckBadge check={contributionCheck} />}
+              </div>
+            )}
+          </section>
+
+          <section className="flex flex-col gap-5">
+            <h2 className="text-base font-semibold text-text">추가 정보 (선택)</h2>
+            <FormField label="관리자" htmlFor="asset-manager" hint="자산을 실제로 보관·관리할 참여자 (선택)">
+              <select
+                id="asset-manager"
+                className="min-h-11 rounded-lg border border-border bg-surface px-3 py-2 text-base text-text focus:ring-2 focus:ring-accent focus:outline-none"
+                value={managerTempId}
+                onChange={(e) => setManagerTempId(e.target.value)}
+              >
+                <option value="">없음</option>
+                {members
+                  .filter((m) => m.name.trim().length > 0)
+                  .map((m) => (
+                    <option key={m.tempId} value={m.tempId}>
+                      {m.name}
+                    </option>
+                  ))}
+              </select>
+            </FormField>
+
+            <FormField label="합의 메모" htmlFor="asset-agreement-note" hint="구매 시 합의한 내용 (선택)">
+              <textarea
+                id="asset-agreement-note"
+                className="min-h-20 rounded-lg border border-border bg-surface px-3 py-2 text-base text-text focus:ring-2 focus:ring-accent focus:outline-none"
+                value={agreementNote}
+                onChange={(e) => setAgreementNote(e.target.value)}
+              />
+            </FormField>
+          </section>
+
+          <div className="flex flex-col gap-2">
             <button
-              type="button"
-              onClick={addMember}
-              className="flex min-h-11 items-center self-start rounded-xl border border-border px-3 text-sm text-text"
+              type="submit"
+              disabled={!canSubmit}
+              className="flex min-h-11 items-center justify-center rounded-lg bg-primary-strong px-4 text-sm font-medium text-white disabled:opacity-40"
             >
-              참여자 추가
+              자산 만들기
             </button>
-          </fieldset>
-
-          {shares.length > 0 && (splitMode === "equal" || shares.some((s) => s.sharePct > 0)) && (
-            <div className="flex flex-col gap-1 rounded-2xl border border-border bg-surface-muted p-3">
-              <p className="text-sm font-medium text-text">지분 미리보기</p>
-              <ul className="flex flex-col gap-1 text-sm text-text-muted">
-                {shares.map((share) => {
-                  const member = members.find((m) => m.tempId === share.memberId);
-                  return (
-                    <li key={share.memberId} className="tabular-nums">
-                      {member?.name || "(이름 없음)"}: {share.sharePct.toFixed(1)}% <FormulaText expr={share.formula} />
-                    </li>
-                  );
-                })}
-              </ul>
-              {splitMode === "contribution" && <ContributionCheckBadge check={contributionCheck} />}
-            </div>
-          )}
-
-          <FormField label="관리자" htmlFor="asset-manager" hint="자산을 실제로 보관·관리할 참여자 (선택)">
-            <select
-              id="asset-manager"
-              className="min-h-11 rounded-xl border border-border bg-surface px-3 py-2 text-base text-text focus:ring-2 focus:ring-accent focus:outline-none"
-              value={managerTempId}
-              onChange={(e) => setManagerTempId(e.target.value)}
-            >
-              <option value="">없음</option>
-              {members
-                .filter((m) => m.name.trim().length > 0)
-                .map((m) => (
-                  <option key={m.tempId} value={m.tempId}>
-                    {m.name}
-                  </option>
-                ))}
-            </select>
-          </FormField>
-
-          <FormField label="합의 메모" htmlFor="asset-agreement-note" hint="구매 시 합의한 내용 (선택)">
-            <textarea
-              id="asset-agreement-note"
-              className="min-h-20 rounded-xl border border-border bg-surface px-3 py-2 text-base text-text focus:ring-2 focus:ring-accent focus:outline-none"
-              value={agreementNote}
-              onChange={(e) => setAgreementNote(e.target.value)}
-            />
-          </FormField>
-
-          <button
-            type="submit"
-            disabled={!canSubmit}
-            className="flex min-h-11 items-center justify-center rounded-xl bg-primary-strong px-4 text-sm font-medium text-white disabled:opacity-40"
-          >
-            자산 만들기
-          </button>
-          {!canSubmit && (
-            <p className="text-xs text-text-muted">
-              물건명, 총 구매금액(0보다 큼), 참여자 2명 이상{splitMode === "contribution" ? ", 전원의 납부액" : ""}을
-              입력하면 만들 수 있어요.
-            </p>
-          )}
+            {!canSubmit && (
+              <p className="text-xs text-text-muted">
+                물건명, 총 구매금액(0보다 큼), 참여자 2명 이상{splitMode === "contribution" ? ", 전원의 납부액" : ""}을
+                입력하면 만들 수 있어요.
+              </p>
+            )}
+          </div>
         </form>
       </main>
     </>

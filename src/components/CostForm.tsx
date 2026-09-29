@@ -35,14 +35,14 @@ export function CostForm({ members, onAdd }: CostFormProps) {
   }
 
   return (
-    <form className="flex flex-col gap-4 rounded-2xl border border-border p-4" onSubmit={handleSubmit}>
+    <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
       <fieldset className="flex flex-col gap-2">
         <legend className="text-sm font-medium text-text">유형</legend>
         <div className="flex gap-2">
           {COST_TYPE_OPTIONS.map((opt) => (
             <label
               key={opt.value}
-              className={`flex min-h-11 cursor-pointer items-center rounded-xl border px-3 text-sm ${
+              className={`flex min-h-11 cursor-pointer items-center rounded-lg border px-3 text-sm ${
                 type === opt.value ? "border-primary-strong bg-primary-strong text-white" : "border-border text-text"
               }`}
             >
@@ -67,7 +67,7 @@ export function CostForm({ members, onAdd }: CostFormProps) {
       <FormField label="부담자" htmlFor="cost-payer" required>
         <select
           id="cost-payer"
-          className="min-h-11 rounded-xl border border-border bg-surface px-3 py-2 text-base text-text focus:ring-2 focus:ring-accent focus:outline-none"
+          className="min-h-11 rounded-lg border border-border bg-surface px-3 py-2 text-base text-text focus:ring-2 focus:ring-accent focus:outline-none"
           value={payerId}
           onChange={(e) => setPayerId(e.target.value)}
         >
@@ -83,7 +83,7 @@ export function CostForm({ members, onAdd }: CostFormProps) {
         <input
           id="cost-date"
           type="date"
-          className="min-h-11 rounded-xl border border-border bg-surface px-3 py-2 text-base text-text focus:ring-2 focus:ring-accent focus:outline-none"
+          className="min-h-11 rounded-lg border border-border bg-surface px-3 py-2 text-base text-text focus:ring-2 focus:ring-accent focus:outline-none"
           value={date}
           onChange={(e) => setDate(e.target.value)}
         />
@@ -92,7 +92,7 @@ export function CostForm({ members, onAdd }: CostFormProps) {
       <FormField label="메모" htmlFor="cost-memo" hint="선택 입력">
         <input
           id="cost-memo"
-          className="min-h-11 rounded-xl border border-border bg-surface px-3 py-2 text-base text-text focus:ring-2 focus:ring-accent focus:outline-none"
+          className="min-h-11 rounded-lg border border-border bg-surface px-3 py-2 text-base text-text focus:ring-2 focus:ring-accent focus:outline-none"
           value={memo}
           onChange={(e) => setMemo(e.target.value)}
         />
@@ -101,7 +101,7 @@ export function CostForm({ members, onAdd }: CostFormProps) {
       <button
         type="submit"
         disabled={!canSubmit}
-        className="flex min-h-11 items-center justify-center rounded-xl bg-primary-strong px-4 text-sm font-medium text-white disabled:opacity-40"
+        className="flex min-h-11 items-center justify-center rounded-lg bg-primary-strong px-4 text-sm font-medium text-white disabled:opacity-40"
       >
         비용 추가
       </button>

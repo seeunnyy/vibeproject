@@ -46,32 +46,36 @@ export default function CostsPage({ params }: { params: Promise<{ id: string }> 
   return (
     <>
       <AppHeader title="비용 기록" backHref={`/app/assets/${asset.id}`} closeHref="/app" />
-      <main className="flex flex-1 flex-col gap-5 px-4 py-6">
-        <CostForm members={asset.members} onAdd={(entry) => addCost(asset.id, entry)} />
-
-        <section>
-          <h2 className="mb-2 text-sm font-medium text-text">비용 목록</h2>
-          <CostList entries={asset.costs} members={asset.members} onDelete={(costId) => deleteCost(asset.id, costId)} />
+      <main className="flex flex-1 flex-col gap-8 px-4 py-6">
+        <section className="flex flex-col gap-4">
+          <h2 className="text-base font-semibold text-text">새 비용</h2>
+          <CostForm members={asset.members} onAdd={(entry) => addCost(asset.id, entry)} />
         </section>
 
-        <section className="rounded-2xl border border-border bg-surface-muted p-4">
-          <h2 className="mb-2 text-sm font-medium text-text">참여자별 낸 비용 합계</h2>
-          <ul className="flex flex-col gap-1 text-sm text-text">
-            {costTotals.map((row) => {
-              const member = asset.members.find((m) => m.id === row.memberId);
-              return (
-                <li key={row.memberId} className="flex justify-between tabular-nums">
-                  <span>{member?.name}</span>
-                  <span>{won(row.paidTotal)}</span>
-                </li>
-              );
-            })}
-            <li className="mt-1 flex justify-between border-t border-border pt-1 font-medium tabular-nums">
-              <span>전체 합계</span>
-              <span>{won(totalCost)}</span>
-            </li>
-          </ul>
-          <p className="mt-2 text-xs text-text-muted">정산에는 반영되지 않습니다.</p>
+        <section className="flex flex-col gap-3">
+          <h2 className="text-base font-semibold text-text">비용 목록</h2>
+          <CostList entries={asset.costs} members={asset.members} onDelete={(costId) => deleteCost(asset.id, costId)} />
+
+          {/* 합계는 목록의 요약이므로 별도 섹션·카드가 아니라 목록 바로 아래 옅은 배경 그룹으로 붙인다(테두리 없음). */}
+          <div className="rounded-xl bg-surface-muted p-4">
+            <h3 className="mb-2 text-sm font-medium text-text-muted">참여자별 낸 비용 합계</h3>
+            <ul className="flex flex-col gap-1 text-sm text-text">
+              {costTotals.map((row) => {
+                const member = asset.members.find((m) => m.id === row.memberId);
+                return (
+                  <li key={row.memberId} className="flex justify-between tabular-nums">
+                    <span>{member?.name}</span>
+                    <span>{won(row.paidTotal)}</span>
+                  </li>
+                );
+              })}
+              <li className="mt-1 flex justify-between border-t border-border pt-1 font-medium tabular-nums">
+                <span>전체 합계</span>
+                <span>{won(totalCost)}</span>
+              </li>
+            </ul>
+            <p className="mt-2 text-xs text-text-muted">정산에는 반영되지 않습니다.</p>
+          </div>
         </section>
       </main>
     </>

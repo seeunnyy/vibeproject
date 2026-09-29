@@ -9,25 +9,23 @@ export function StatusBadge({ asset }: { asset: Asset }) {
   const blocked = !checkContribution(asset).ok;
   const settlement = blocked ? null : computeSaleSettlement(asset);
 
+  // 목록 행마다 색 배경 pill을 붙이지 않고 글자(굵기·색·기호)로만 상태를 구분한다.
+  // 조치가 필요한 "납부액 확인 필요"만 경고색을 쓰고, 나머지는 조용하게 둔다. 색만으로 구분하지 않도록 기호 병기.
   if (blocked) {
     return (
-      <span className="shrink-0 rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-700">
-        납부액 확인 필요
+      <span className="shrink-0 text-xs font-semibold text-amber-700">
+        <span aria-hidden="true">⚠ </span>납부액 확인 필요
       </span>
     );
   }
 
   if (settlement) {
     return (
-      <span className="shrink-0 rounded-full bg-primary-strong/10 px-2 py-1 text-xs font-medium text-primary-strong">
-        정산 완료
+      <span className="shrink-0 text-xs font-medium text-primary-strong">
+        <span aria-hidden="true">✓ </span>정산 완료
       </span>
     );
   }
 
-  return (
-    <span className="shrink-0 rounded-full bg-surface-muted px-2 py-1 text-xs font-medium text-text-muted">
-      정산 전
-    </span>
-  );
+  return <span className="shrink-0 text-xs text-text-muted">정산 전</span>;
 }

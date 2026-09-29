@@ -9,7 +9,7 @@ export function SettlementResult({ result, members }: { result: SettlementResult
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="overflow-x-auto rounded-2xl border border-border">
+      <div className="overflow-x-auto rounded-xl border border-border">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-surface-muted text-left text-text-muted">
@@ -35,12 +35,12 @@ export function SettlementResult({ result, members }: { result: SettlementResult
       </div>
 
       {result.checkOk ? (
-        <p className="flex items-center gap-1.5 rounded-xl bg-green-50 px-3 py-2.5 text-sm text-green-800">
+        <p className="flex items-center gap-1.5 text-sm text-green-800">
           <span aria-hidden="true">✓</span> 받을 금액 합계({won(result.rows.reduce((t, r) => t + r.receive, 0))})가
           매각가와 일치합니다
         </p>
       ) : (
-        <p role="alert" className="flex items-center gap-1.5 rounded-xl bg-red-50 px-3 py-2.5 text-sm text-red-800">
+        <p role="alert" className="flex items-center gap-1.5 rounded-lg bg-red-50 px-3 py-2.5 text-sm text-red-800">
           <span aria-hidden="true">⚠</span> 받을 금액 합계 검증에 실패했습니다. 결과를 신뢰할 수 없습니다.
         </p>
       )}

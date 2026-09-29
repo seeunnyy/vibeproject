@@ -108,142 +108,158 @@ export default function AssetDetailPage({ params }: { params: Promise<{ id: stri
   return (
     <>
       <AppHeader title={asset.name} backHref="/app" />
-      <main className="flex flex-1 flex-col gap-5 px-4 py-6">
-        <section className="flex flex-col gap-1">
-          {asset.purchaseDate && <p className="text-sm text-text-muted">구매일: {asset.purchaseDate}</p>}
-          <p className="text-lg font-semibold tabular-nums">{won(asset.totalAmount)}</p>
+      {/* 정보 구조: section(제목) → group(테두리 1개 또는 배경 1개) → item(구분선으로만 나눔).
+          항목마다 독립 카드를 만들지 않고, 같은 성격끼리 한 그룹으로 묶는다. */}
+      <main className="flex flex-1 flex-col gap-8 px-4 py-6">
+        <section aria-label="자산 개요" className="flex flex-col gap-3">
+          <div className="flex flex-col gap-1">
+            {/* 숫자만 크게 두지 않고 무엇의 금액인지 라벨을 먼저 붙인다. 구매일은 보조 정보로 뒤에 둔다. */}
+            <p className="text-xs text-text-muted">총 구매금액</p>
+            <p className="text-2xl font-semibold tabular-nums">{won(asset.totalAmount)}</p>
+            {asset.purchaseDate && <p className="text-xs text-text-muted">구매일 {asset.purchaseDate}</p>}
+          </div>
+          <ContributionCheckBadge check={contributionCheck} />
         </section>
 
-        <ContributionCheckBadge check={contributionCheck} />
+        <section className="flex flex-col gap-4">
+          <h2 className="text-base font-semibold text-text">참여자</h2>
 
-        <section className="flex flex-col gap-2">
-          <label htmlFor="manager-select" className="text-sm font-medium text-text">
-            관리자
-          </label>
-          <select
-            id="manager-select"
-            className="min-h-11 rounded-xl border border-border bg-surface px-3 py-2 text-base text-text focus:ring-2 focus:ring-accent focus:outline-none"
-            value={asset.managerId ?? ""}
-            onChange={(e) => updateAsset(asset.id, { managerId: e.target.value || undefined })}
-          >
-            <option value="">관리자 미지정</option>
-            {asset.members.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.name}
-              </option>
-            ))}
-          </select>
-          {manager ? (
-            <p className="text-xs text-text-muted">현재 관리자: {manager.name}</p>
-          ) : (
-            <p className="text-xs text-text-muted">관리자 미지정</p>
+          <div className="flex flex-col gap-2">
+            <h3 className="text-sm font-medium text-text-muted">지분·납부액·낸 비용</h3>
+            <MemberTable rows={rows} />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <h3 className="text-sm font-medium text-text-muted">참여자 관리</h3>
+            <ul className="divide-y divide-border rounded-xl border border-border">
+              {asset.members.map((member) => {
+                const reason = removeReason(member.id);
+                return (
+                  <li key={member.id} className="flex items-center justify-between gap-3 py-1 pr-2 pl-4 text-sm">
+                    <span>{member.name}</span>
+                    <button
+                      type="button"
+                      disabled={!!reason}
+                      title={reason}
+                      onClick={() => handleRemoveMember(member.id, member.name)}
+                      className="flex min-h-11 shrink-0 items-center rounded-lg px-2 text-xs text-text-muted hover:bg-surface-muted disabled:opacity-30"
+                    >
+                      삭제
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+
+            <form onSubmit={handleAddMember} className="mt-1 flex items-start gap-2">
+              <div className="flex flex-1 flex-col gap-1">
+                <label htmlFor="new-member-name" className="sr-only">
+                  새 참여자 이름
+                </label>
+                <input
+                  id="new-member-name"
+                  className="min-h-11 rounded-lg border border-border bg-surface px-3 py-2 text-base text-text focus:ring-2 focus:ring-accent focus:outline-none"
+                  value={newMemberName}
+                  onChange={(e) => setNewMemberName(e.target.value)}
+                  placeholder="새 참여자 이름"
+                />
+              </div>
+              {asset.splitMode === "contribution" && (
+                <div className="flex w-32 flex-col gap-1">
+                  <label htmlFor="new-member-contribution" className="sr-only">
+                    새 참여자 납부액
+                  </label>
+                  <NumberInput
+                    id="new-member-contribution"
+                    value={newMemberContribution}
+                    onChange={setNewMemberContribution}
+                    placeholder="납부액"
+                  />
+                </div>
+              )}
+              <button
+                type="submit"
+                disabled={!canAddMember}
+                className="flex min-h-11 shrink-0 items-center rounded-lg border border-border px-3 text-sm text-text disabled:opacity-40"
+              >
+                추가
+              </button>
+            </form>
+            <p className="text-xs text-text-muted">
+              참여자를 추가하면 지분이 다시 계산돼요
+              {asset.splitMode === "contribution" && ". 납부액 합계가 총 구매금액과 달라지면 위 안내에 다시 표시돼요"}
+            </p>
+          </div>
+        </section>
+
+        <section className="flex flex-col gap-4">
+          <h2 className="text-base font-semibold text-text">자산 정보</h2>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="manager-select" className="text-sm font-medium text-text-muted">
+              관리자
+            </label>
+            <select
+              id="manager-select"
+              className="min-h-11 rounded-lg border border-border bg-surface px-3 py-2 text-base text-text focus:ring-2 focus:ring-accent focus:outline-none"
+              value={asset.managerId ?? ""}
+              onChange={(e) => updateAsset(asset.id, { managerId: e.target.value || undefined })}
+            >
+              <option value="">관리자 미지정</option>
+              {asset.members.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.name}
+                </option>
+              ))}
+            </select>
+            {manager ? (
+              <p className="text-xs text-text-muted">현재 관리자: {manager.name}</p>
+            ) : (
+              <p className="text-xs text-text-muted">관리자 미지정</p>
+            )}
+          </div>
+
+          {asset.agreementNote && (
+            <div>
+              <h3 className="text-sm font-medium text-text-muted">합의 메모</h3>
+              <p className="mt-1 whitespace-pre-wrap text-sm text-text">{asset.agreementNote}</p>
+            </div>
           )}
         </section>
 
-        {asset.agreementNote && (
-          <section>
-            <h2 className="text-sm font-medium text-text">합의 메모</h2>
-            <p className="mt-1 whitespace-pre-wrap text-sm text-text-muted">{asset.agreementNote}</p>
-          </section>
-        )}
-
-        <section>
-          <h2 className="mb-2 text-sm font-medium text-text">참여자별 지분·납부액·낸 비용</h2>
-          <MemberTable rows={rows} />
-        </section>
-
-        <section className="flex flex-col gap-3">
-          <h2 className="text-sm font-medium text-text">참여자 관리</h2>
-          <ul className="flex flex-col gap-2">
-            {asset.members.map((member) => {
-              const reason = removeReason(member.id);
-              return (
-                <li
-                  key={member.id}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-border px-3 py-2.5 text-sm"
-                >
-                  <span>{member.name}</span>
-                  <button
-                    type="button"
-                    disabled={!!reason}
-                    title={reason}
-                    onClick={() => handleRemoveMember(member.id, member.name)}
-                    className="flex min-h-11 shrink-0 items-center rounded-xl px-2 text-xs text-text-muted hover:bg-surface-muted disabled:opacity-30"
-                  >
-                    삭제
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-
-          <form onSubmit={handleAddMember} className="flex items-start gap-2">
-            <div className="flex flex-1 flex-col gap-1">
-              <label htmlFor="new-member-name" className="sr-only">
-                새 참여자 이름
-              </label>
-              <input
-                id="new-member-name"
-                className="min-h-11 rounded-xl border border-border bg-surface px-3 py-2 text-base text-text focus:ring-2 focus:ring-accent focus:outline-none"
-                value={newMemberName}
-                onChange={(e) => setNewMemberName(e.target.value)}
-                placeholder="새 참여자 이름"
-              />
-            </div>
-            {asset.splitMode === "contribution" && (
-              <div className="flex w-32 flex-col gap-1">
-                <label htmlFor="new-member-contribution" className="sr-only">
-                  새 참여자 납부액
-                </label>
-                <NumberInput
-                  id="new-member-contribution"
-                  value={newMemberContribution}
-                  onChange={setNewMemberContribution}
-                  placeholder="납부액"
-                />
-              </div>
-            )}
-            <button
-              type="submit"
-              disabled={!canAddMember}
-              className="flex min-h-11 shrink-0 items-center rounded-xl border border-border px-3 text-sm text-text disabled:opacity-40"
-            >
-              추가
-            </button>
-          </form>
-          <p className="text-xs text-text-muted">
-            참여자를 추가하면 지분이 다시 계산돼요
-            {asset.splitMode === "contribution" && ". 납부액 합계가 총 구매금액과 달라지면 위 안내에 다시 표시돼요"}
-          </p>
-        </section>
-
+        {/* 같은 무게의 테두리 버튼 3개를 반복하지 않고, 하나의 이동 메뉴 그룹으로 묶는다. */}
         <section className="flex flex-col gap-2">
-          <Link
-            href={`/app/assets/${asset.id}/costs`}
-            className="flex min-h-11 items-center justify-center rounded-xl border border-border text-center text-sm font-medium text-text"
-          >
-            비용 기록
-          </Link>
-          <Link
-            href={`/app/assets/${asset.id}/summary`}
-            className="flex min-h-11 items-center justify-center rounded-xl border border-border text-center text-sm font-medium text-text"
-          >
-            요약 보기
-          </Link>
-          <button
-            type="button"
-            disabled={!contributionCheck.ok}
-            onClick={() => router.push(`/app/assets/${asset.id}/termination`)}
-            className="flex min-h-11 items-center justify-center rounded-xl border border-border text-center text-sm font-medium text-text disabled:opacity-40"
-          >
-            종료·정산
-          </button>
+          <h2 className="text-base font-semibold text-text">다음 단계</h2>
+          <nav aria-label="자산 작업" className="divide-y divide-border rounded-xl border border-border">
+            <Link
+              href={`/app/assets/${asset.id}/costs`}
+              className="flex min-h-12 items-center justify-between px-4 text-sm font-medium text-text"
+            >
+              비용 기록
+              <span aria-hidden="true" className="text-text-muted">›</span>
+            </Link>
+            <Link
+              href={`/app/assets/${asset.id}/summary`}
+              className="flex min-h-12 items-center justify-between px-4 text-sm font-medium text-text"
+            >
+              요약 보기
+              <span aria-hidden="true" className="text-text-muted">›</span>
+            </Link>
+            <button
+              type="button"
+              disabled={!contributionCheck.ok}
+              onClick={() => router.push(`/app/assets/${asset.id}/termination`)}
+              className="flex min-h-12 w-full items-center justify-between px-4 text-sm font-medium text-text disabled:opacity-40"
+            >
+              종료·정산
+              <span aria-hidden="true" className="text-text-muted">›</span>
+            </button>
+          </nav>
           {blockedReason && <p className="text-xs text-amber-700">{blockedReason}</p>}
         </section>
 
         <Link
           href="/app"
-          className="mt-2 flex min-h-11 items-center justify-center text-sm font-medium text-text-muted underline underline-offset-2"
+          className="flex min-h-11 items-center justify-center text-sm font-medium text-text-muted underline underline-offset-2"
         >
           자산 목록으로 나가기
         </Link>

@@ -36,13 +36,14 @@ export default function AssetListPage() {
         )}
 
         {assets.length > 0 && (
-          <ul className="flex flex-col gap-3">
+          // 자산 하나하나를 독립 카드로 반복하지 않고 하나의 그룹(테두리 1개) 안에서 구분선으로 나눈다.
+          <ul className="divide-y divide-border rounded-xl border border-border">
             {assets.map((asset) => {
               const manager = asset.members.find((m) => m.id === asset.managerId);
               return (
-                <li key={asset.id} className="rounded-2xl border border-border p-4">
+                <li key={asset.id} className="py-3 pr-2 pl-4">
                   <div className="flex items-start justify-between gap-3">
-                    <Link href={`/app/assets/${asset.id}`} className="min-w-0 flex-1">
+                    <Link href={`/app/assets/${asset.id}`} className="min-w-0 flex-1 py-1">
                       <div className="flex items-center gap-2">
                         <h2 className="truncate font-semibold text-text">{asset.name}</h2>
                         <StatusBadge asset={asset} />
@@ -57,7 +58,7 @@ export default function AssetListPage() {
                     <button
                       type="button"
                       onClick={() => handleDelete(asset.id, asset.name)}
-                      className="flex min-h-11 shrink-0 items-center rounded-xl px-2 text-xs text-text-muted hover:bg-surface-muted"
+                      className="flex min-h-11 shrink-0 items-center rounded-lg px-2 text-xs text-text-muted hover:bg-surface-muted"
                     >
                       삭제
                     </button>
@@ -71,7 +72,7 @@ export default function AssetListPage() {
         {assets.length > 0 && (
           <Link
             href="/app/assets/new"
-            className="flex min-h-11 items-center self-center rounded-xl bg-primary-strong px-4 text-sm font-medium text-white"
+            className="flex min-h-11 items-center self-center rounded-lg bg-primary-strong px-4 text-sm font-medium text-white"
           >
             자산 추가
           </Link>

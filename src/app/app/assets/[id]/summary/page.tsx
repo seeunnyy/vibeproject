@@ -85,7 +85,7 @@ export default function SummaryPage({ params }: { params: Promise<{ id: string }
   return (
     <>
       <AppHeader title="공유 요약" backHref={`/app/assets/${asset.id}`} closeHref="/app" />
-      <main className="flex flex-1 flex-col gap-5 px-4 py-6">
+      <main className="flex flex-1 flex-col gap-8 px-4 py-6">
         <section className="flex flex-col gap-1">
           <h2 className="text-lg font-semibold text-text">{asset.name}</h2>
           {asset.purchaseDate && <p className="text-sm text-text-muted">구매일: {asset.purchaseDate}</p>}
@@ -141,7 +141,7 @@ export default function SummaryPage({ params }: { params: Promise<{ id: string }
         <button
           type="button"
           onClick={handleCopy}
-          className="flex min-h-11 items-center justify-center rounded-xl bg-primary-strong px-4 text-sm font-medium text-white"
+          className="flex min-h-11 items-center justify-center rounded-lg bg-primary-strong px-4 text-sm font-medium text-white"
         >
           요약 복사
         </button>

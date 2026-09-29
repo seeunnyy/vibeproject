@@ -15,7 +15,7 @@ export function EmptyState({ message, actionLabel, onAction, actionHref }: Empty
       {actionLabel && actionHref && (
         <Link
           href={actionHref}
-          className="flex min-h-11 items-center rounded-xl bg-primary-strong px-5 text-sm font-medium text-white"
+          className="flex min-h-11 items-center rounded-lg bg-primary-strong px-5 text-sm font-medium text-white"
         >
           {actionLabel}
         </Link>
@@ -24,7 +24,7 @@ export function EmptyState({ message, actionLabel, onAction, actionHref }: Empty
         <button
           type="button"
           onClick={onAction}
-          className="flex min-h-11 items-center rounded-xl bg-primary-strong px-5 text-sm font-medium text-white"
+          className="flex min-h-11 items-center rounded-lg bg-primary-strong px-5 text-sm font-medium text-white"
         >
           {actionLabel}
         </button>
