@@ -33,7 +33,15 @@ export default function AssetListPage() {
         {saveError && <Banner tone="warn" message="저장되지 않을 수 있습니다. 브라우저 설정을 확인해 주세요." />}
 
         {mounted && assets.length === 0 && (
-          <EmptyState message="아직 등록한 자산이 없어요" actionLabel="자산 추가" actionHref="/app/assets/new" />
+          // 시각: Figma "01-0 자산 목록 · 빈 상태" — 2.5D 상자 픽토그램(public/illustrations/empty-assets.svg).
+          <EmptyState
+            illustration="/illustrations/empty-assets.svg"
+            title="아직 등록한 자산이 없어요"
+            description={"함께 산 물건을 등록하면\n각자의 지분과 비용을 한눈에 정리할 수 있어요"}
+            actionLabel="첫 자산 등록하기"
+            actionHref="/app/assets/new"
+            hint="예: 공용 냉장고, 동아리 빔프로젝터, 캠핑 텐트"
+          />
         )}
 
         {assets.length > 0 && (

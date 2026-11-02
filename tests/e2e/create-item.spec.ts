@@ -8,7 +8,7 @@ test.describe("자산 생성 → 목록", () => {
     await page.goto("/app");
 
     await expect(page.getByText("아직 등록한 자산이 없어요")).toBeVisible();
-    await expect(page.getByRole("link", { name: "자산 추가" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "첫 자산 등록하기" })).toBeVisible();
   });
 
   test("필수 입력이 없으면 생성이 차단된다", async ({ page }) => {
@@ -43,7 +43,7 @@ test.describe("전체 흐름", () => {
 
     // S1 → S2
     await page.goto("/app");
-    await page.getByRole("link", { name: "자산 추가" }).click();
+    await page.getByRole("link", { name: "첫 자산 등록하기" }).click();
 
     // S2 자산 생성 (납부액 모드, 3명, 50/30/20)
     await page.getByLabel("물건명").fill("공용 냉장고");
