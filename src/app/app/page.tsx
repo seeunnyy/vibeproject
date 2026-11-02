@@ -37,10 +37,8 @@ export default function AssetListPage() {
           <EmptyState
             illustration="/illustrations/empty-assets.svg"
             title="아직 등록한 자산이 없어요"
-            description={"함께 산 물건을 등록하면\n각자의 지분과 비용을 한눈에 정리할 수 있어요"}
             actionLabel="첫 자산 등록하기"
             actionHref="/app/assets/new"
-            hint="예: 공용 냉장고, 동아리 빔프로젝터, 캠핑 텐트"
           />
         )}
 
