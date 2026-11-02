@@ -13,7 +13,8 @@ import { Icon } from "@/components/Icon";
 import { NumberInput } from "@/components/NumberInput";
 import { SectionHeader } from "@/components/Section";
 import { useAssetStore } from "@/lib/state/AssetStoreProvider";
-import { checkContribution, computeShares } from "@/lib/calc/shares";
+import { checkContribution, computeEqualBurdens, computeShares } from "@/lib/calc/shares";
+import { comma, won } from "@/lib/calc/format";
 import type { Asset, SplitMode } from "@/lib/types";
 
 // S2 자산 생성 — 출처: planning/md-design/03_UX_UI_SPEC.md S2
@@ -78,6 +79,10 @@ export default function NewAssetPage() {
   );
   const shares = useMemo(() => computeShares(previewAsset), [previewAsset]);
   const contributionCheck = useMemo(() => checkContribution(previewAsset), [previewAsset]);
+  const equalBurdens = useMemo(
+    () => (splitMode === "equal" ? computeEqualBurdens(previewAsset) : []),
+    [splitMode, previewAsset],
+  );
 
   const trimmedName = name.trim();
   const validMembers = members.filter((m) => m.name.trim().length > 0);
@@ -130,7 +135,7 @@ export default function NewAssetPage() {
   }
 
   const previewAside =
-    splitMode === "equal" ? "100 ÷ 참여자 수" : contributionCheck.ok ? "납부액 ÷ 총 구매금액" : "납부액 ÷ 납부액 합계";
+    splitMode === "equal" ? "총 구매금액 ÷ 참여자 수" : contributionCheck.ok ? "납부액 ÷ 총 구매금액" : "납부액 ÷ 납부액 합계";
 
   return (
     <>
@@ -259,7 +264,13 @@ export default function NewAssetPage() {
                       key: share.memberId,
                       label: member?.name || "(이름 없음)",
                       value: `${share.sharePct.toFixed(1)}%`,
-                      sub: share.formula,
+                      // 균등 분할: 지분율 아래 줄을 "450,000 ÷ 2 = 225,000원"(총 구매금액 ÷ 참여자 수 = 부담액)으로.
+                      sub:
+                        splitMode === "equal"
+                          ? `${comma(numericTotal)} ÷ ${members.length} = ${won(
+                              equalBurdens.find((b) => b.memberId === share.memberId)?.burden ?? 0,
+                            )}`
+                          : share.formula,
                     };
                   })}
                 />

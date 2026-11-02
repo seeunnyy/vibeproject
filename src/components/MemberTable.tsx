@@ -8,6 +8,9 @@ export interface MemberTableRow {
   formula: string;
   paidTotal: number;
   isManager: boolean;
+  // 균등 분할 자산이면 computeEqualBurdens로 계산한 부담액. 있으면 "납부" 줄을 "부담"으로 바꿔 보여준다
+  // (균등 모드는 납부액이 0으로 저장되므로 "납부 0원"이 나오지 않게).
+  burden?: number;
 }
 
 // 출처: 03_UX_UI_SPEC.md §4 — MemberTable (S3, S7).
@@ -47,8 +50,8 @@ export function MemberTable({
             </p>
             <dl className="text-[13px] leading-[18px] text-text-muted tabular-nums">
               <div className="flex gap-1">
-                <dt>납부</dt>
-                <dd>{won(row.member.contribution)}</dd>
+                <dt>{row.burden !== undefined ? "부담" : "납부"}</dt>
+                <dd>{won(row.burden ?? row.member.contribution)}</dd>
               </div>
               <div className="flex gap-1">
                 <dt>{paidLabel}</dt>

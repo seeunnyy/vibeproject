@@ -15,7 +15,7 @@ import { NumberInput } from "@/components/NumberInput";
 import { SectionHeader } from "@/components/Section";
 import { Icon } from "@/components/Icon";
 import { useAssetStore } from "@/lib/state/AssetStoreProvider";
-import { checkContribution, computeShares } from "@/lib/calc/shares";
+import { checkContribution, computeEqualBurdens, computeShares } from "@/lib/calc/shares";
 import { sumCostsByPayer } from "@/lib/calc/costs";
 import { won } from "@/lib/calc/format";
 import { TERMINATION_LABEL, isEnded, withJosa } from "@/lib/labels";
@@ -61,6 +61,7 @@ export default function AssetDetailPage({ params }: { params: Promise<{ id: stri
     );
   }
 
+  const burdens = asset.splitMode === "equal" ? computeEqualBurdens(asset) : null;
   const rows: MemberTableRow[] = asset.members.map((member) => {
     const share = shares.find((s) => s.memberId === member.id);
     const paidTotal = costTotals.find((c) => c.memberId === member.id)?.paidTotal ?? 0;
@@ -70,6 +71,7 @@ export default function AssetDetailPage({ params }: { params: Promise<{ id: stri
       formula: share?.formula ?? "",
       paidTotal,
       isManager: asset.managerId === member.id,
+      burden: burdens?.find((b) => b.memberId === member.id)?.burden,
     };
   });
 

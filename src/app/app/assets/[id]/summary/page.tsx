@@ -9,7 +9,7 @@ import { SectionHeader } from "@/components/Section";
 import { MemberTable, type MemberTableRow } from "@/components/MemberTable";
 import { SettlementResult } from "@/components/SettlementResult";
 import { useAssetStore } from "@/lib/state/AssetStoreProvider";
-import { checkContribution, computeShares } from "@/lib/calc/shares";
+import { checkContribution, computeEqualBurdens, computeShares } from "@/lib/calc/shares";
 import { sumCostsByPayer } from "@/lib/calc/costs";
 import { computeSaleSettlement } from "@/lib/calc/settlement";
 import { toSummaryText } from "@/lib/storage/assetStore";
@@ -59,6 +59,7 @@ export default function SummaryPage({ params }: { params: Promise<{ id: string }
   }
 
   const manager = asset.members.find((m) => m.id === asset.managerId);
+  const burdens = asset.splitMode === "equal" ? computeEqualBurdens(asset) : null;
   const rows: MemberTableRow[] = asset.members.map((member) => {
     const share = shares.find((s) => s.memberId === member.id);
     const paidTotal = costTotals.find((c) => c.memberId === member.id)?.paidTotal ?? 0;
@@ -68,6 +69,7 @@ export default function SummaryPage({ params }: { params: Promise<{ id: string }
       formula: share?.formula ?? "",
       paidTotal,
       isManager: asset.managerId === member.id,
+      burden: burdens?.find((b) => b.memberId === member.id)?.burden,
     };
   });
 

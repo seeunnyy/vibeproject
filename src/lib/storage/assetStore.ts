@@ -1,6 +1,7 @@
 import { EMPTY_STORE, STORAGE_KEY, type StoreSchema } from "@/lib/storage/schema";
 import type { Asset, ContributionCheck, CostTotalRow, ShareRow, SettlementResult } from "@/lib/types";
 import { won } from "@/lib/calc/format";
+import { computeEqualBurdens } from "@/lib/calc/shares";
 import { TERMINATION_LABEL } from "@/lib/labels";
 
 // 출처: planning/md-design/04_TECHNICAL_DESIGN.md §6
@@ -91,20 +92,28 @@ export function toSummaryText(
   if (asset.agreementNote) lines.push(`합의 메모: ${asset.agreementNote}`);
   lines.push("");
 
-  lines.push("참여자별 지분·납부액·낸 비용 합계");
+  // 균등 분할은 납부액이 0으로 저장되므로 "납부액" 대신 계산한 부담액(총 구매금액 ÷ 참여자 수)을 적는다.
+  const isEqual = asset.splitMode === "equal";
+  const burdens = isEqual ? computeEqualBurdens(asset) : [];
+  lines.push(isEqual ? "참여자별 지분·부담액·낸 비용 합계" : "참여자별 지분·납부액·낸 비용 합계");
   for (const share of derived.shares) {
     const member = asset.members.find((m) => m.id === share.memberId);
     const paid = derived.costTotals.find((c) => c.memberId === share.memberId)?.paidTotal ?? 0;
+    const amount = isEqual
+      ? `부담액 ${won(burdens.find((b) => b.memberId === share.memberId)?.burden ?? 0)}`
+      : `납부액 ${won(member?.contribution ?? 0)}`;
     lines.push(
-      `- ${member?.name ?? "알 수 없음"}: 지분 ${share.sharePct.toFixed(1)}% (${share.formula}) · 납부액 ${won(
-        member?.contribution ?? 0,
-      )} · 낸 비용 합계 ${won(paid)}`,
+      `- ${member?.name ?? "알 수 없음"}: 지분 ${share.sharePct.toFixed(1)}% (${share.formula}) · ${amount} · 낸 비용 합계 ${won(
+        paid,
+      )}`,
     );
   }
   lines.push(
-    derived.contribution.ok
-      ? "납부액 합계가 총 구매금액과 일치합니다."
-      : `납부액 합계가 총 구매금액과 ${won(Math.abs(derived.contribution.diff))} 차이 있습니다.`,
+    isEqual
+      ? `총 구매금액을 ${asset.members.length}명이 똑같이 부담합니다.`
+      : derived.contribution.ok
+        ? "납부액 합계가 총 구매금액과 일치합니다."
+        : `납부액 합계가 총 구매금액과 ${won(Math.abs(derived.contribution.diff))} 차이 있습니다.`,
   );
   lines.push("");
 

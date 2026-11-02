@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Asset } from "@/lib/types";
-import { computeShares } from "@/lib/calc/shares";
+import { computeEqualBurdens, computeShares } from "@/lib/calc/shares";
 
 function makeAsset(overrides: Partial<Asset>): Asset {
   return {
@@ -73,5 +73,36 @@ describe("computeShares", () => {
     });
     const rows = computeShares(asset);
     expect(rows.map((r) => r.sharePct)).toEqual([0, 0]);
+  });
+});
+
+describe("computeEqualBurdens", () => {
+  const member = (id: string) => ({ id, name: id, contribution: 0 });
+
+  it("나누어떨어지면 모두 같은 금액: 450,000원 2명 → 225,000 / 225,000", () => {
+    const asset = makeAsset({ splitMode: "equal", totalAmount: 450000, members: [member("m1"), member("m2")] });
+    expect(computeEqualBurdens(asset)).toEqual([
+      { memberId: "m1", burden: 225000 },
+      { memberId: "m2", burden: 225000 },
+    ]);
+  });
+
+  it("남는 원은 첫 번째 참여자에게: 100,000원 3명 → 33,334 / 33,333 / 33,333, 합계 = 총 구매금액", () => {
+    const asset = makeAsset({
+      splitMode: "equal",
+      totalAmount: 100000,
+      members: [member("m1"), member("m2"), member("m3")],
+    });
+    const burdens = computeEqualBurdens(asset);
+    expect(burdens.map((b) => b.burden)).toEqual([33334, 33333, 33333]);
+    expect(burdens.reduce((sum, b) => sum + b.burden, 0)).toBe(100000);
+  });
+
+  it("참여자를 추가하면 다시 계산된다: 450,000원 2명 → 3명이면 150,000씩", () => {
+    const before = makeAsset({ splitMode: "equal", totalAmount: 450000, members: [member("m1"), member("m2")] });
+    const after = { ...before, members: [...before.members, member("m3")] };
+    expect(computeEqualBurdens(before).map((b) => b.burden)).toEqual([225000, 225000]);
+    expect(computeEqualBurdens(after).map((b) => b.burden)).toEqual([150000, 150000, 150000]);
+    expect(computeEqualBurdens(after).reduce((sum, b) => sum + b.burden, 0)).toBe(450000);
   });
 });

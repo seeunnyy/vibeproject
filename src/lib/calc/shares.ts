@@ -80,3 +80,15 @@ function indexOfMax(values: number[]): number {
   }
   return best;
 }
+
+// 균등 분할 자산의 참여자별 부담액. 균등 모드는 납부액을 0으로 저장하므로, 화면·요약에 "얼마를 부담하는지"를
+// 보여줄 때마다 이 함수로 계산한다(저장하지 않음 → 참여자를 추가·삭제하면 자동으로 다시 계산된다).
+// 규칙: 부담액 = 총 구매금액 ÷ 참여자 수를 원 단위로 내림하고, 나누고 남은 원은 참여자 목록 첫 번째 사람에게 더한다.
+// 그래서 합계가 항상 총 구매금액과 정확히 같다(예: 100,000원 3명 → 33,334 / 33,333 / 33,333).
+export function computeEqualBurdens(asset: Asset): Array<{ memberId: string; burden: number }> {
+  const count = asset.members.length;
+  if (count === 0) return [];
+  const base = Math.floor(asset.totalAmount / count);
+  const remainder = asset.totalAmount - base * count;
+  return asset.members.map((m, i) => ({ memberId: m.id, burden: i === 0 ? base + remainder : base }));
+}
