@@ -38,9 +38,16 @@ export default function SettlementsOverviewPage() {
   return (
     <>
       <LargeHeader title="정산 현황" />
-      <main className="flex flex-1 flex-col gap-3 px-5 pt-3 pb-6">
+      {/* 빈 상태일 때는 자산 목록과 같은 아래 여백(pb-2)을 써서 Figma 시안(2163:550)과 같은 세로 위치에 둔다. */}
+      <main className={`flex flex-1 flex-col gap-3 px-5 pt-3 ${mounted && assets.length === 0 ? "pb-2" : "pb-6"}`}>
         {mounted && assets.length === 0 && (
-          <EmptyState message="등록된 자산이 없어요" actionLabel="자산 추가" actionHref="/app/assets/new" />
+          // 시각: Figma "정산 현황 · 빈 상태"(node 2163:550) — 자산 목록 빈 상태와 같은 픽토그램·문구·버튼.
+          <EmptyState
+            illustration="/illustrations/empty-assets.svg"
+            title="아직 등록한 자산이 없어요"
+            actionLabel="첫 자산 등록하기"
+            actionHref="/app/assets/new"
+          />
         )}
 
         {assets.length > 0 && (
