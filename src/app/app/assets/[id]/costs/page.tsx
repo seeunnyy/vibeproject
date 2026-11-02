@@ -5,12 +5,14 @@ import Link from "next/link";
 import { AppHeader } from "@/components/AppHeader";
 import { CostForm } from "@/components/CostForm";
 import { CostList } from "@/components/CostList";
+import { SectionHeader } from "@/components/Section";
 import { useAssetStore } from "@/lib/state/AssetStoreProvider";
 import { sumCostsByPayer } from "@/lib/calc/costs";
 import { won } from "@/lib/calc/format";
 
 // S4 비용 기록 — 출처: planning/md-design/03_UX_UI_SPEC.md S4
 // 근거: FR-5, FR-6, R-3, R-10.
+// 시각: Figma "04 비용 기록" — 새 비용 / 비용 목록(건수) / 참여자별 낸 비용(회색 카드 + 구분선 + 전체 합계), 섹션 간격 36px.
 export default function CostsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { assets, mounted, addCost, deleteCost } = useAssetStore();
@@ -46,36 +48,35 @@ export default function CostsPage({ params }: { params: Promise<{ id: string }> 
   return (
     <>
       <AppHeader title="비용 기록" backHref={`/app/assets/${asset.id}`} closeHref="/app" />
-      <main className="flex flex-1 flex-col gap-8 px-4 py-6">
+      <main className="flex flex-1 flex-col gap-9 px-5 pt-2 pb-10">
         <section className="flex flex-col gap-4">
-          <h2 className="text-base font-semibold text-text">새 비용</h2>
+          <SectionHeader title="새 비용" />
           <CostForm members={asset.members} onAdd={(entry) => addCost(asset.id, entry)} />
         </section>
 
         <section className="flex flex-col gap-3">
-          <h2 className="text-base font-semibold text-text">비용 목록</h2>
+          <SectionHeader title="비용 목록" aside={`${asset.costs.length}건`} />
           <CostList entries={asset.costs} members={asset.members} onDelete={(costId) => deleteCost(asset.id, costId)} />
+        </section>
 
-          {/* 합계는 목록의 요약이므로 별도 섹션·카드가 아니라 목록 바로 아래 옅은 배경 그룹으로 붙인다(테두리 없음). */}
-          <div className="rounded-xl bg-surface-muted p-4">
-            <h3 className="mb-2 text-sm font-medium text-text-muted">참여자별 낸 비용 합계</h3>
-            <ul className="flex flex-col gap-1 text-sm text-text">
-              {costTotals.map((row) => {
-                const member = asset.members.find((m) => m.id === row.memberId);
-                return (
-                  <li key={row.memberId} className="flex justify-between tabular-nums">
-                    <span>{member?.name}</span>
-                    <span>{won(row.paidTotal)}</span>
-                  </li>
-                );
-              })}
-              <li className="mt-1 flex justify-between border-t border-border pt-1 font-medium tabular-nums">
-                <span>전체 합계</span>
-                <span>{won(totalCost)}</span>
-              </li>
-            </ul>
-            <p className="mt-2 text-xs text-text-muted">정산에는 반영되지 않습니다.</p>
-          </div>
+        <section className="flex flex-col gap-3">
+          <SectionHeader title="참여자별 낸 비용" />
+          <dl className="flex flex-col gap-2.5 rounded-2xl bg-surface-muted p-4 text-[15px] leading-[22px] tabular-nums">
+            {costTotals.map((row) => {
+              const member = asset.members.find((m) => m.id === row.memberId);
+              return (
+                <div key={row.memberId} className="flex items-center text-text">
+                  <dt className="min-w-0 flex-1">{member?.name}</dt>
+                  <dd className="shrink-0">{won(row.paidTotal)}</dd>
+                </div>
+              );
+            })}
+            <div className="flex items-center border-t border-border pt-2.5 font-medium text-primary">
+              <dt className="flex-1">전체 합계</dt>
+              <dd className="shrink-0">{won(totalCost)}</dd>
+            </div>
+          </dl>
+          <p className="text-xs leading-4 text-text-muted">비용 기록은 정산 금액에 반영되지 않아요</p>
         </section>
       </main>
     </>

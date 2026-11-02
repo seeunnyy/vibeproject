@@ -3,6 +3,8 @@
 import { use, useMemo, useState } from "react";
 import Link from "next/link";
 import { AppHeader } from "@/components/AppHeader";
+import { BottomBar, Button } from "@/components/Button";
+import { SectionHeader } from "@/components/Section";
 import { MemberTable, type MemberTableRow } from "@/components/MemberTable";
 import { SettlementResult } from "@/components/SettlementResult";
 import { useAssetStore } from "@/lib/state/AssetStoreProvider";
@@ -20,6 +22,8 @@ const COST_TYPE_LABEL: Record<string, string> = {
 
 // S7 공유 요약 — 출처: planning/md-design/03_UX_UI_SPEC.md S7
 // 근거: FR-10, AC-11. 모든 요소는 읽기 전용.
+// 시각: Figma "07 공유 요약" — 20px 자산명 + 회색 정보 카드, 합의 메모 텍스트, 참여자·지분/비용 내역 회색 카드(구분선),
+// 파란 정산 결과 카드, 하단 고정 남색 "요약 복사".
 export default function SummaryPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { assets, mounted } = useAssetStore();
@@ -82,71 +86,94 @@ export default function SummaryPage({ params }: { params: Promise<{ id: string }
     }
   }
 
+  const infoRows = [
+    ...(asset.purchaseDate ? [{ label: "구매일", value: asset.purchaseDate }] : []),
+    { label: "총 구매금액", value: won(asset.totalAmount) },
+    { label: "관리자", value: manager ? manager.name : "미지정" },
+    { label: "종료 규칙", value: "매각" },
+  ];
+
   return (
     <>
       <AppHeader title="공유 요약" backHref={`/app/assets/${asset.id}`} closeHref="/app" />
-      <main className="flex flex-1 flex-col gap-8 px-4 py-6">
-        <section className="flex flex-col gap-1">
-          <h2 className="text-lg font-semibold text-text">{asset.name}</h2>
-          {asset.purchaseDate && <p className="text-sm text-text-muted">구매일: {asset.purchaseDate}</p>}
-          <p className="text-sm text-text tabular-nums">총 구매금액: {won(asset.totalAmount)}</p>
-          <p className="text-sm text-text">관리자: {manager ? manager.name : "미지정"}</p>
+      <main className="flex flex-1 flex-col gap-8 px-5 pt-2 pb-8">
+        <section className="flex flex-col gap-3.5">
+          <h2 className="text-xl leading-7 font-bold tracking-[-0.01em] text-primary">{asset.name}</h2>
+          <dl className="flex flex-col gap-2.5 rounded-2xl bg-surface-muted p-4 tabular-nums">
+            {infoRows.map((row) => (
+              <div key={row.label} className="flex items-center">
+                <dt className="flex-1 text-[13px] leading-[18px] text-text-muted">{row.label}</dt>
+                <dd className="text-sm leading-5 font-medium text-primary">{row.value}</dd>
+              </div>
+            ))}
+          </dl>
         </section>
 
         {asset.agreementNote && (
-          <section>
-            <h3 className="text-sm font-medium text-text">합의 메모</h3>
-            <p className="mt-1 whitespace-pre-wrap text-sm text-text-muted">{asset.agreementNote}</p>
+          <section className="flex flex-col gap-2">
+            <SectionHeader title="합의 메모" />
+            <p className="text-[15px] leading-[22px] whitespace-pre-wrap text-text">{asset.agreementNote}</p>
           </section>
         )}
 
-        <section>
-          <h3 className="mb-2 text-sm font-medium text-text">참여자·지분·비용</h3>
-          <MemberTable rows={rows} />
+        {asset.terminationNote && (
+          <section className="flex flex-col gap-2">
+            <SectionHeader title="종료 합의 메모" />
+            <p className="text-[15px] leading-[22px] whitespace-pre-wrap text-text">{asset.terminationNote}</p>
+          </section>
+        )}
+
+        <section className="flex flex-col gap-3">
+          <SectionHeader title="참여자·지분" aside={`${asset.members.length}명`} />
+          <MemberTable rows={rows} grouped />
         </section>
 
-        <section>
-          <h3 className="mb-2 text-sm font-medium text-text">비용 내역</h3>
+        <section className="flex flex-col gap-3">
+          <SectionHeader title="비용 내역" aside={`${asset.costs.length}건`} />
           {asset.costs.length === 0 ? (
-            <p className="text-sm text-text-muted">기록된 비용이 없습니다.</p>
+            <p className="text-[13px] leading-[18px] text-text-muted">기록된 비용이 없습니다.</p>
           ) : (
-            <ul className="flex flex-col gap-1 text-sm text-text-muted">
+            <ul className="flex flex-col divide-y divide-border rounded-2xl bg-surface-muted px-4 py-1">
               {asset.costs.map((cost) => (
-                <li key={cost.id} className="tabular-nums">
-                  {cost.date} {COST_TYPE_LABEL[cost.type]} {won(cost.amount)} (부담자:{" "}
-                  {asset.members.find((m) => m.id === cost.payerId)?.name ?? "알 수 없음"})
+                <li key={cost.id} className="flex flex-col gap-0.5 py-3 tabular-nums">
+                  <p className="flex items-center text-sm leading-5 font-medium text-primary">
+                    <span className="flex-1">{COST_TYPE_LABEL[cost.type]}</span>
+                    <span>{won(cost.amount)}</span>
+                  </p>
+                  <p className="text-[13px] leading-[18px] text-text-muted">
+                    {cost.date} · 부담자 {asset.members.find((m) => m.id === cost.payerId)?.name ?? "알 수 없음"}
+                  </p>
                 </li>
               ))}
             </ul>
           )}
         </section>
 
-        <section>
-          <h3 className="mb-2 text-sm font-medium text-text">종료·정산</h3>
-          <p className="text-sm text-text-muted">종료 규칙: 매각</p>
-          {asset.terminationNote && <p className="mt-1 text-sm text-text-muted">종료 합의 메모: {asset.terminationNote}</p>}
+        <section className="flex flex-col gap-3">
+          <SectionHeader
+            title="정산 결과"
+            aside={settlement ? `매각가 ${won(settlement.salePrice)}` : undefined}
+          />
           {settlement ? (
-            <div className="mt-2">
-              <SettlementResult result={settlement} members={asset.members} />
-            </div>
+            <SettlementResult result={settlement} members={asset.members} title="" />
           ) : (
-            <p className="mt-2 text-sm text-text-muted">
-              <Link href={`/app/assets/${asset.id}/settlement`} className="text-primary-strong underline">
-                매각가를 입력하면 정산 결과가 표시됩니다
-              </Link>
-            </p>
+            <Link
+              href={`/app/assets/${asset.id}/settlement`}
+              className="flex min-h-11 items-center gap-0.5 self-start text-sm leading-5 font-medium text-primary-strong"
+            >
+              매각가를 입력하면 정산 결과가 표시됩니다
+            </Link>
           )}
         </section>
-
-        <button
-          type="button"
-          onClick={handleCopy}
-          className="flex min-h-11 items-center justify-center rounded-lg bg-primary-strong px-4 text-sm font-medium text-white"
-        >
-          요약 복사
-        </button>
-        {copied && <p role="status" className="text-xs text-green-700">복사됨</p>}
       </main>
+      <BottomBar>
+        {copied && (
+          <p role="status" className="text-center text-xs leading-4 text-success">
+            복사됨
+          </p>
+        )}
+        <Button onClick={handleCopy}>요약 복사</Button>
+      </BottomBar>
     </>
   );
 }

@@ -6,28 +6,21 @@ export interface EmptyStateProps {
   actionHref?: string;
 }
 
-import Link from "next/link";
+import { Button, ButtonLink } from "@/components/Button";
 
 export function EmptyState({ message, actionLabel, onAction, actionHref }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center gap-4 py-14 text-center">
-      <p className="text-sm text-text-muted">{message}</p>
+      <p className="text-[15px] leading-[22px] text-text-muted">{message}</p>
       {actionLabel && actionHref && (
-        <Link
-          href={actionHref}
-          className="flex min-h-11 items-center rounded-lg bg-primary-strong px-5 text-sm font-medium text-white"
-        >
+        <ButtonLink href={actionHref} variant="accent" className="px-6">
           {actionLabel}
-        </Link>
+        </ButtonLink>
       )}
       {actionLabel && onAction && !actionHref && (
-        <button
-          type="button"
-          onClick={onAction}
-          className="flex min-h-11 items-center rounded-lg bg-primary-strong px-5 text-sm font-medium text-white"
-        >
+        <Button onClick={onAction} variant="accent" className="px-6">
           {actionLabel}
-        </button>
+        </Button>
       )}
     </div>
   );

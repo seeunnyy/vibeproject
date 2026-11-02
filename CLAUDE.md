@@ -67,6 +67,13 @@ Session 8: 카드 과다 사용 정리(기능 변경 없음). 자산 목록·정
 상태, 정상 상태 초록 박스 → 텍스트, 설정 통계 타일 → 중립색 통계 행, 라운드 한 단계 축소, 랜딩 왼쪽 정렬 재구성.
 규칙은 `docs/DESIGN.md` "장식 요소 원칙" 참고.
 
+Session 9: Figma "우리몫 디자인 시안"(node `2113:11361`)으로 전체 화면 리디자인(기능·계산·저장 로직 변경 없음).
+남색 헤더 → 흰 헤더 + 원형 뒤로/닫기, 탭 화면은 큰 왼쪽 제목. 테두리 그룹 → 회색 카드, 계산 결과는 파란 강조 카드.
+자산 삭제는 목록에서 자산 상세 맨 아래로 이동, 자산 추가는 FAB. 자산 상세의 "다음 단계" 메뉴는 "다음 할 일" 카드 +
+"진행 단계" 타임라인으로 교체(시안에 없어 시안 부품으로 구성), 참여자 관리는 "참여자 추가·삭제"로 접음.
+금액 입력은 "원" + 콤마 표시. 아이콘은 Figma에서 받은 `public/icons/*.svg`를 `Icon`(CSS mask)으로 사용.
+Session 8의 "카드 사용 원칙/장식 요소 원칙"은 이 시안 기준으로 `docs/DESIGN.md`에서 대체됐다.
+
 ## Working Rules
 - Read relevant files before suggesting changes.
 - Explain the plan before editing files.

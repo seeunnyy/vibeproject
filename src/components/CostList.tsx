@@ -14,9 +14,12 @@ export interface CostListProps {
 }
 
 // 출처: 03_UX_UI_SPEC.md §4 — CostList (S4). 최신순, 삭제는 confirm 후.
+// 시각: Figma "04 비용 기록 > 비용 목록" — 내역마다 회색 카드(모서리 16px, 패딩 16×14, 간격 8px),
+// 첫 줄 유형 · 금액(15px medium), 둘째 줄 날짜 · 부담자 · 메모 + 오른쪽 "삭제"(13px muted).
+// 시안은 부담자 이름만 적었지만, 07 요약 시안처럼 "부담자" 라벨을 붙여 누가 낸 돈인지 분명히 한다.
 export function CostList({ entries, members, onDelete }: CostListProps) {
   if (entries.length === 0) {
-    return <p className="text-sm text-text-muted">아직 기록된 비용이 없어요.</p>;
+    return <p className="text-[13px] leading-[18px] text-text-muted">아직 기록된 비용이 없어요.</p>;
   }
 
   const nameOf = (id: string) => members.find((m) => m.id === id)?.name ?? "알 수 없음";
@@ -26,26 +29,27 @@ export function CostList({ entries, members, onDelete }: CostListProps) {
   }
 
   return (
-    // 내역마다 독립 카드를 두지 않고 하나의 그룹 안에서 구분선으로 나눈다(docs/DESIGN.md 카드 사용 원칙).
-    <ul className="divide-y divide-border rounded-xl border border-border">
+    <ul className="flex flex-col gap-2">
       {entries.map((entry) => (
-        <li key={entry.id} className="flex items-center justify-between gap-3 py-2 pr-2 pl-4 text-sm">
-          <div>
-            <p className="tabular-nums">
-              {COST_TYPE_LABEL[entry.type]} · {won(entry.amount)}
-            </p>
-            <p className="text-xs text-text-muted">
-              {entry.date} · 부담자: {nameOf(entry.payerId)}
+        <li key={entry.id} className="flex flex-col gap-1 rounded-2xl bg-surface-muted px-4 pt-3.5 pb-1">
+          <p className="flex items-center gap-2 text-[15px] leading-[22px] font-medium text-primary tabular-nums">
+            <span className="min-w-0 flex-1">{COST_TYPE_LABEL[entry.type]}</span>
+            <span className="shrink-0">{won(entry.amount)}</span>
+          </p>
+          <div className="flex items-center gap-2 text-[13px] leading-[18px] text-text-muted">
+            <p className="min-w-0 flex-1 tabular-nums">
+              {entry.date} · 부담자 {nameOf(entry.payerId)}
               {entry.memo && ` · ${entry.memo}`}
             </p>
+            <button
+              type="button"
+              onClick={() => handleDelete(entry.id)}
+              aria-label={`${COST_TYPE_LABEL[entry.type]} ${won(entry.amount)} 삭제`}
+              className="-mr-1 flex min-h-11 shrink-0 items-center px-1 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+            >
+              삭제
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={() => handleDelete(entry.id)}
-            className="flex min-h-11 shrink-0 items-center rounded-lg px-2 text-xs text-text-muted hover:bg-surface-muted"
-          >
-            삭제
-          </button>
         </li>
       ))}
     </ul>

@@ -2,11 +2,14 @@
 // 입력 중에는 숫자만 받고, 표시는 상위(FormField)의 라벨/에러에 맡긴다.
 //
 // docs/UX_IMPROVEMENT_PROPOSAL.md #1, #5 반영:
-// - type="number" + min={0}만으로는 "-", "e" 같은 문자의 타이핑 자체를 막지 못했다(자가검진에서 실제 확인).
-//   type="text" + inputMode="numeric"으로 바꾸고 onChange에서 숫자 외 문자를 모두 제거해 음수·소수·지수
+// - type="text" + inputMode="numeric"으로 두고 onChange에서 숫자 외 문자를 모두 제거해 음수·소수·지수
 //   표기가 애초에 입력되지 않게 막는다(토스의 "포맷으로 입력 자체를 제어" 원칙).
 // - 빈 문자열을 0으로 바꾸지 않고 그대로 상위에 전달한다 — 지우면 "0"으로 스냅되던 마찰을 없앤다.
-import { sanitizeDigits } from "@/lib/calc/format";
+//
+// 시각: Figma "컴포넌트 > Field (unit)" — 입력칸 오른쪽 끝에 "원", 값은 천 단위 콤마로 표시.
+// 콤마는 표시용일 뿐이다: 화면에 "900,000"이 보여도 sanitizeDigits가 콤마를 지우므로 상위로는 숫자만 간다.
+import { comma, sanitizeDigits } from "@/lib/calc/format";
+import { FIELD_BOX } from "@/components/FormField";
 
 export interface NumberInputProps {
   id: string;
@@ -14,24 +17,42 @@ export interface NumberInputProps {
   onChange: (value: number | "") => void;
   min?: number;
   placeholder?: string;
+  unit?: string;
+  align?: "left" | "right";
+  className?: string;
   "aria-describedby"?: string;
 }
 
-export function NumberInput({ id, value, onChange, min = 0, placeholder, ...rest }: NumberInputProps) {
+export function NumberInput({
+  id,
+  value,
+  onChange,
+  min = 0,
+  placeholder,
+  unit = "원",
+  align = "left",
+  className = "",
+  ...rest
+}: NumberInputProps) {
   return (
-    <input
-      id={id}
-      type="text"
-      inputMode="numeric"
-      min={min}
-      value={value}
-      placeholder={placeholder}
-      onChange={(e) => {
-        const digits = sanitizeDigits(e.target.value);
-        onChange(digits === "" ? "" : Number(digits));
-      }}
-      className="min-h-11 rounded-lg border border-border bg-surface px-3 py-2 text-base text-text focus:ring-2 focus:ring-accent focus:outline-none"
-      {...rest}
-    />
+    <div
+      className={`flex h-[52px] items-center gap-2 focus-within:ring-2 focus-within:ring-accent ${FIELD_BOX} ${className}`}
+    >
+      <input
+        id={id}
+        type="text"
+        inputMode="numeric"
+        min={min}
+        value={value === "" ? "" : comma(value)}
+        placeholder={placeholder}
+        onChange={(e) => {
+          const digits = sanitizeDigits(e.target.value);
+          onChange(digits === "" ? "" : Number(digits));
+        }}
+        className={`h-full w-full min-w-0 flex-1 bg-transparent tabular-nums ${align === "right" ? "text-right" : "text-left"} placeholder:text-text-muted focus:outline-none`}
+        {...rest}
+      />
+      {unit && <span className="shrink-0 font-medium text-text-muted">{unit}</span>}
+    </div>
   );
 }

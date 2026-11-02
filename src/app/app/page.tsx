@@ -1,27 +1,28 @@
 "use client";
 
 import Link from "next/link";
-import { AppHeader } from "@/components/AppHeader";
+import { LargeHeader } from "@/components/AppHeader";
+import { AvatarGroup } from "@/components/Avatar";
 import { Banner } from "@/components/Banner";
 import { EmptyState } from "@/components/EmptyState";
-import { StatusBadge } from "@/components/StatusBadge";
+import { Fab } from "@/components/Fab";
+import { Icon } from "@/components/Icon";
+import { ContributionDiffNote, StatusBadge } from "@/components/StatusBadge";
 import { useAssetStore } from "@/lib/state/AssetStoreProvider";
 import { won } from "@/lib/calc/format";
+import type { Asset } from "@/lib/types";
 
 // S1 자산 목록 — 출처: planning/md-design/03_UX_UI_SPEC.md S1
+// 시각: Figma "01 자산 목록" — 큰 제목 헤더, 자산마다 회색 카드(surface-muted, 모서리 16px, 패딩 16px),
+// 하단 떠 있는 "자산 추가" 버튼(FAB). 카드 전체가 자산 상세로 가는 링크다.
+// 자산 삭제는 목록에서 빼고 자산 상세 맨 아래 "이 자산 삭제"로 옮겼다(실수로 지우는 일을 줄이기 위함).
 export default function AssetListPage() {
-  const { assets, mounted, loadError, saveError, deleteAsset, resetStore } = useAssetStore();
-
-  function handleDelete(id: string, name: string) {
-    if (window.confirm(`"${name}"을(를) 삭제할까요? 되돌릴 수 없습니다.`)) {
-      deleteAsset(id);
-    }
-  }
+  const { assets, mounted, loadError, saveError, resetStore } = useAssetStore();
 
   return (
     <>
-      <AppHeader title="자산 목록" />
-      <main className="flex flex-1 flex-col gap-4 px-4 py-6">
+      <LargeHeader title="자산 목록" caption={mounted ? `함께 산 물건 ${assets.length}개` : undefined} />
+      <main className="flex flex-1 flex-col gap-3 px-5 pt-3 pb-2">
         {loadError && (
           <Banner
             tone="error"
@@ -36,48 +37,43 @@ export default function AssetListPage() {
         )}
 
         {assets.length > 0 && (
-          // 자산 하나하나를 독립 카드로 반복하지 않고 하나의 그룹(테두리 1개) 안에서 구분선으로 나눈다.
-          <ul className="divide-y divide-border rounded-xl border border-border">
-            {assets.map((asset) => {
-              const manager = asset.members.find((m) => m.id === asset.managerId);
-              return (
-                <li key={asset.id} className="py-3 pr-2 pl-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <Link href={`/app/assets/${asset.id}`} className="min-w-0 flex-1 py-1">
-                      <div className="flex items-center gap-2">
-                        <h2 className="truncate font-semibold text-text">{asset.name}</h2>
-                        <StatusBadge asset={asset} />
-                      </div>
-                      <p className="mt-1 text-sm text-text-muted tabular-nums">
-                        참여자 {asset.members.length}명 · 총 {won(asset.totalAmount)}
-                      </p>
-                      <p className="mt-1 text-xs text-text-muted">
-                        관리자: {manager ? manager.name : "미지정"}
-                      </p>
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(asset.id, asset.name)}
-                      className="flex min-h-11 shrink-0 items-center rounded-lg px-2 text-xs text-text-muted hover:bg-surface-muted"
-                    >
-                      삭제
-                    </button>
-                  </div>
-                </li>
-              );
-            })}
+          <ul className="flex flex-col gap-3">
+            {assets.map((asset) => (
+              <li key={asset.id}>
+                <AssetCard asset={asset} />
+              </li>
+            ))}
           </ul>
         )}
-
-        {assets.length > 0 && (
-          <Link
-            href="/app/assets/new"
-            className="flex min-h-11 items-center self-center rounded-lg bg-primary-strong px-4 text-sm font-medium text-white"
-          >
-            자산 추가
-          </Link>
-        )}
       </main>
+      {assets.length > 0 && <Fab href="/app/assets/new" label="자산 추가" />}
     </>
+  );
+}
+
+function AssetCard({ asset }: { asset: Asset }) {
+  const manager = asset.members.find((m) => m.id === asset.managerId);
+
+  return (
+    <Link
+      href={`/app/assets/${asset.id}`}
+      className="flex flex-col gap-2.5 rounded-2xl bg-surface-muted p-4 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+    >
+      <div className="flex items-center gap-2">
+        <h2 className="min-w-0 flex-1 truncate text-[15px] leading-[22px] font-medium text-primary">{asset.name}</h2>
+        <StatusBadge asset={asset} />
+      </div>
+      <p className="text-[13px] leading-[18px] text-text-muted tabular-nums">
+        참여자 {asset.members.length}명 · 총 {won(asset.totalAmount)}
+      </p>
+      <ContributionDiffNote asset={asset} />
+      <div className="flex items-center justify-between">
+        <AvatarGroup names={asset.members.map((m) => m.name)} />
+        <span className="flex items-center gap-0.5 text-[13px] leading-[18px] text-text-muted">
+          관리자 {manager ? manager.name : "미지정"}
+          <Icon name="chevron-right" size={18} />
+        </span>
+      </div>
+    </Link>
   );
 }

@@ -11,6 +11,9 @@
   --color-border: #e1e7f0;
   --color-text: #0f172a;
   --color-text-muted: #5b6478;
+  --color-primary-soft: #e8effc;
+  --color-error: #b91c1c;
+  --color-success: #15803d;
 }
 
 @theme inline {
@@ -23,6 +26,9 @@
   --color-border: var(--color-border);
   --color-text: var(--color-text);
   --color-text-muted: var(--color-text-muted);
+  --color-primary-soft: var(--color-primary-soft);
+  --color-error: var(--color-error);
+  --color-success: var(--color-success);
 }
 
 body {
