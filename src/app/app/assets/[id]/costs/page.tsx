@@ -1,8 +1,8 @@
 "use client";
 
 import { use, useMemo } from "react";
-import Link from "next/link";
 import { AppHeader } from "@/components/AppHeader";
+import { StatusScreen } from "@/components/StatusScreen";
 import { CostForm } from "@/components/CostForm";
 import { CostList } from "@/components/CostList";
 import { SectionHeader } from "@/components/Section";
@@ -24,12 +24,7 @@ export default function CostsPage({ params }: { params: Promise<{ id: string }> 
     return (
       <>
         <AppHeader title="비용 기록" backHref="/app" />
-        <main className="flex flex-1 flex-col items-center justify-center gap-3 px-4 py-10 text-center">
-          <p className="text-sm text-text-muted">해당 자산을 찾을 수 없어요.</p>
-          <Link href="/app" className="text-sm text-primary-strong underline">
-            목록으로 돌아가기
-          </Link>
-        </main>
+        <StatusScreen message="해당 자산을 찾을 수 없어요." actionLabel="목록으로 돌아가기" href="/app" />
       </>
     );
   }

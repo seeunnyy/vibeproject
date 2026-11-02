@@ -11,16 +11,18 @@ export function SettlementResult({
   result,
   members,
   title = "받을 금액",
+  checkGap = "gap-6",
 }: {
   result: SettlementResultType;
   members: Member[];
   title?: string;
+  checkGap?: "gap-6" | "gap-3"; // 카드와 검증 문구 사이: 06 정산 24px, 07 공유 요약 12px(시안)
 }) {
   const nameOf = (id: string) => members.find((m) => m.id === id)?.name ?? "알 수 없음";
   const receiveTotal = result.rows.reduce((t, r) => t + r.receive, 0);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className={`flex flex-col ${checkGap}`}>
       <HighlightCard
         title={title || undefined}
         rows={result.rows.map((row) => ({

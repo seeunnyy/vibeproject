@@ -37,7 +37,9 @@ export const FIELD_BOX =
 
 export const inputClassName = `h-[52px] w-full ${FIELD_BOX}`;
 
-export const textareaClassName = `min-h-28 w-full resize-y py-3.5 ${FIELD_BOX}`;
+// 시안 Textarea: 높이 112px, 위아래 14px, 글자 12px/22px(02·05).
+export const textareaClassName =
+  "h-28 w-full resize-none rounded-xl bg-surface-muted px-4 py-3.5 text-xs leading-[22px] text-text placeholder:text-text-muted focus:ring-2 focus:ring-accent focus:outline-none";
 
 // 기본 화살표 대신 시안의 chevron-down(20px, muted)을 오른쪽에 둔다.
 export function Select({ className = "", ...rest }: React.SelectHTMLAttributes<HTMLSelectElement>) {

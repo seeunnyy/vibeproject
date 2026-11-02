@@ -17,10 +17,10 @@ const FLOAT_CARD = "rounded-[20px] bg-surface p-[18px] shadow-[0_10px_28px_0_rgb
 export default function LandingPage() {
   return (
     <main className="flex flex-1 flex-col bg-primary-soft">
-      <div className="flex flex-1 flex-col items-center px-6 pt-[66px] pb-2">
+      <div className="flex flex-1 flex-col items-center px-6 pt-[92px] pb-2">
         <p className="text-[32px] leading-8 font-bold tracking-[-0.01em] text-[#6a83b3]">우리몫</p>
 
-        <div aria-hidden="true" className="relative mt-[54px] h-[280px] w-[342px] max-w-full shrink-0">
+        <div aria-hidden="true" className="relative mt-7 h-[280px] w-[342px] max-w-full shrink-0">
           <div className="absolute top-[0.83px] left-2 flex h-[146.687px] w-[230.319px] items-center justify-center">
             <div className={`flex w-[220px] -rotate-5 flex-col gap-2.5 ${FLOAT_CARD}`}>
               <p className="text-[15px] leading-[22px] font-medium text-primary">공용 냉장고</p>
@@ -42,7 +42,7 @@ export default function LandingPage() {
               <p className="text-xs leading-4 text-text-muted">450,000 × 44.5%</p>
             </div>
           </div>
-          <div className="absolute top-[18px] left-[270px] flex size-14 items-center justify-center rounded-full bg-surface text-primary-strong shadow-[0_10px_28px_0_rgba(20,33,61,0.1)]">
+          <div className="absolute top-[68px] left-[260px] flex size-14 items-center justify-center rounded-full bg-surface text-primary-strong shadow-[0_10px_28px_0_rgba(20,33,61,0.1)]">
             <Icon name="check" size={26} />
           </div>
         </div>

@@ -4,11 +4,12 @@ import Link from "next/link";
 import { LargeHeader } from "@/components/AppHeader";
 import { EmptyState } from "@/components/EmptyState";
 import { Icon } from "@/components/Icon";
-import { ContributionDiffNote, StatusBadge } from "@/components/StatusBadge";
+import { StatusBadge } from "@/components/StatusBadge";
 import { useAssetStore } from "@/lib/state/AssetStoreProvider";
 import { checkContribution } from "@/lib/calc/shares";
 import { computeSaleSettlement } from "@/lib/calc/settlement";
 import { won } from "@/lib/calc/format";
+import { TERMINATION_LABEL, isEnded, withJosa } from "@/lib/labels";
 import type { Asset } from "@/lib/types";
 
 // 정산 현황 — 전체 자산의 정산 상태를 모아보는 화면 (탭바 2번째 탭).
@@ -17,25 +18,26 @@ import type { Asset } from "@/lib/types";
 // — 계산 로직·검증을 한 곳(S6)에만 두기 위함.
 // 시각: Figma "08 정산 현황" — 캡션에 상태별 개수, 자산마다 회색 카드, 정산 완료면 흰 결과 박스, 오른쪽 파란 텍스트 링크.
 function statusOf(asset: Asset) {
-  const blocked = !checkContribution(asset).ok;
-  const settlement = blocked ? null : computeSaleSettlement(asset);
-  return { blocked, settlement };
+  const ended = isEnded(asset);
+  const blocked = !ended && !checkContribution(asset).ok;
+  const settlement = ended || blocked ? null : computeSaleSettlement(asset);
+  return { ended, blocked, settlement };
+}
+
+function actionOf(asset: Asset, { ended, blocked, settlement }: ReturnType<typeof statusOf>) {
+  if (ended) return { label: "요약 보기", href: `/app/assets/${asset.id}/summary` };
+  if (blocked) return { label: "자산 상세에서 확인하기", href: `/app/assets/${asset.id}` };
+  return { label: settlement ? "정산 내역 수정" : "정산하기", href: `/app/assets/${asset.id}/settlement` };
 }
 
 export default function SettlementsOverviewPage() {
   const { assets, mounted } = useAssetStore();
 
   const statuses = assets.map(statusOf);
-  const doneCount = statuses.filter((s) => s.settlement).length;
-  const blockedCount = statuses.filter((s) => s.blocked).length;
-  const pendingCount = assets.length - doneCount - blockedCount;
-  const caption = mounted
-    ? `정산 완료 ${doneCount} · 정산 전 ${pendingCount} · 확인 필요 ${blockedCount}`
-    : undefined;
 
   return (
     <>
-      <LargeHeader title="정산 현황" caption={caption} />
+      <LargeHeader title="정산 현황" />
       <main className="flex flex-1 flex-col gap-3 px-5 pt-3 pb-6">
         {mounted && assets.length === 0 && (
           <EmptyState message="등록된 자산이 없어요" actionLabel="자산 추가" actionHref="/app/assets/new" />
@@ -44,11 +46,13 @@ export default function SettlementsOverviewPage() {
         {assets.length > 0 && (
           <ul className="flex flex-col gap-3">
             {assets.map((asset, i) => {
-              const { blocked, settlement } = statuses[i];
+              const status = statuses[i];
+              const { settlement } = status;
+              const action = actionOf(asset, status);
               const receiveTotal = settlement?.rows.reduce((sum, row) => sum + row.receive, 0) ?? 0;
 
               return (
-                <li key={asset.id} className="flex flex-col gap-2.5 rounded-2xl bg-surface-muted px-4 pt-4 pb-2">
+                <li key={asset.id} className="flex flex-col gap-2.5 rounded-2xl bg-surface-muted p-4">
                   <div className="flex items-center gap-2">
                     <h2 className="min-w-0 flex-1 truncate text-[15px] leading-[22px] font-medium text-primary">
                       {asset.name}
@@ -58,7 +62,11 @@ export default function SettlementsOverviewPage() {
                   <p className="text-[13px] leading-[18px] text-text-muted tabular-nums">
                     참여자 {asset.members.length}명 · 총 {won(asset.totalAmount)}
                   </p>
-                  <ContributionDiffNote asset={asset} />
+                  {status.ended && (
+                    <p className="text-[13px] leading-[18px] text-text tabular-nums">
+                      {withJosa(TERMINATION_LABEL[asset.termination.kind], "으로", "로")} 종료 · {asset.endedAt}
+                    </p>
+                  )}
 
                   {settlement && (
                     <dl className="flex flex-col gap-1.5 rounded-xl bg-surface px-3.5 py-3 tabular-nums">
@@ -74,10 +82,10 @@ export default function SettlementsOverviewPage() {
                   )}
 
                   <Link
-                    href={blocked ? `/app/assets/${asset.id}` : `/app/assets/${asset.id}/settlement`}
-                    className="flex min-h-11 items-center gap-0.5 self-end text-sm leading-5 font-medium text-primary-strong"
+                    href={action.href}
+                    className="relative flex h-8 items-center gap-0.5 self-end text-sm leading-5 font-medium text-primary-strong after:absolute after:-inset-y-1.5 after:inset-x-0 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
                   >
-                    {blocked ? "자산 상세에서 확인하기" : settlement ? "정산 내역 수정" : "정산하기"}
+                    {action.label}
                     <Icon name="chevron-right" size={18} />
                   </Link>
                 </li>

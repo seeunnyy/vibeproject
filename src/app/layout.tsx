@@ -1,5 +1,14 @@
 import type { Metadata } from "next";
+import { Noto_Sans_KR } from "next/font/google";
 import "./globals.css";
+
+// Figma 시안 서체. next/font가 빌드 시 받아 self-host하므로 런타임 외부 요청·새 패키지 없음.
+const notoSansKr = Noto_Sans_KR({
+  weight: ["400", "500", "700"],
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-noto-sans-kr",
+});
 
 export const metadata: Metadata = {
   title: "우리몫",
@@ -12,7 +21,7 @@ export const metadata: Metadata = {
 // 나타났다 사라졌다 하지 않으므로 가운데 정렬된 카드가 좌우로 밀리지 않는다.
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ko" className="h-full antialiased">
+    <html lang="ko" className={`h-full antialiased ${notoSansKr.variable}`}>
       <body className="flex h-dvh justify-center overflow-hidden bg-app-bg">
         <div className="flex h-dvh w-full max-w-[430px] flex-col overflow-y-auto bg-surface text-text shadow-2xl">
           {children}

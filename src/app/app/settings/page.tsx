@@ -5,11 +5,9 @@ import { Button } from "@/components/Button";
 import { SectionHeader } from "@/components/Section";
 import { StepTimeline } from "@/components/StepTimeline";
 import { useAssetStore } from "@/lib/state/AssetStoreProvider";
-import { checkContribution } from "@/lib/calc/shares";
-import { computeSaleSettlement } from "@/lib/calc/settlement";
 
 // 설정 — 데이터 초기화 및 앱 정보 (탭바 3번째 탭).
-// 시각: Figma "09 설정" — 캡션 "우리몫" + 큰 제목, 회색 통계 카드 3개, 번호 레일 이용 방법,
+// 시각: Figma "09 설정" — 큰 제목, 번호 레일 이용 방법,
 // 흰 테두리 pill의 빨간 "모든 데이터 초기화", 앱 정보 텍스트. 섹션 간격 36px.
 // 결제·인증 등 MVP 범위를 벗어나는 기능은 추가하지 않는다(CLAUDE.md Boundaries).
 const GUIDE_STEPS = [
@@ -21,13 +19,7 @@ const GUIDE_STEPS = [
 ] as const;
 
 export default function SettingsPage() {
-  const { assets, resetStore } = useAssetStore();
-
-  const settledCount = assets.filter((asset) => {
-    const check = checkContribution(asset);
-    return check.ok && computeSaleSettlement(asset) !== null;
-  }).length;
-  const memberCount = assets.reduce((sum, asset) => sum + asset.members.length, 0);
+  const { resetStore } = useAssetStore();
 
   function handleReset() {
     if (window.confirm("모든 자산 데이터를 삭제할까요? 되돌릴 수 없습니다.")) {
@@ -37,25 +29,8 @@ export default function SettingsPage() {
 
   return (
     <>
-      <LargeHeader title="설정" caption="우리몫" />
+      <LargeHeader title="설정" />
       <main className="flex flex-1 flex-col gap-9 px-5 pt-3 pb-8">
-        <section aria-label="데이터 현황">
-          <dl className="grid grid-cols-3 gap-2">
-            {[
-              { label: "등록 자산", value: assets.length },
-              { label: "정산 완료", value: settledCount },
-              { label: "참여자 수", value: memberCount },
-            ].map((stat) => (
-              <div key={stat.label} className="flex flex-col-reverse gap-0.5 rounded-2xl bg-surface-muted px-4 py-3.5">
-                <dt className="text-[13px] leading-[18px] text-text-muted">{stat.label}</dt>
-                <dd className="text-xl leading-7 font-bold tracking-[-0.01em] text-primary tabular-nums">
-                  {stat.value}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </section>
-
         <section className="flex flex-col gap-4">
           <SectionHeader title="우리몫 이용 방법" />
           <StepTimeline steps={GUIDE_STEPS} />

@@ -74,6 +74,15 @@ Session 9: Figma "우리몫 디자인 시안"(node `2113:11361`)으로 전체 �
 금액 입력은 "원" + 콤마 표시. 아이콘은 Figma에서 받은 `public/icons/*.svg`를 `Icon`(CSS mask)으로 사용.
 Session 8의 "카드 사용 원칙/장식 요소 원칙"은 이 시안 기준으로 `docs/DESIGN.md`에서 대체됐다.
 
+Session 10: 갱신된 Figma 시안(화면 14개, 노드 목록은 `docs/DESIGN.md` Source of Truth)을 **정답**으로 다시 맞춤.
+앱을 390px · 시안 프레임 높이로 캡처해 시안과 나란히 비교하며 수정. 폰트는 Noto Sans KR(`next/font/google`)로 변경.
+기능 변경(이것만, 계산 로직 `lib/calc`·리듀서는 그대로):
+- 자산 상세: "다음 할 일" 카드·진행 단계 → 시안의 "다음 단계" 메뉴(`MenuList`), "참여자 수정". 03은 산출식 표시 안 함(07에서 확인).
+- 종료 규칙: 인수·폐기 선택 가능. 계산 없이 `termination.kind` + `Asset.endedAt`만 저장(`TerminationRule`에서 `buyerId` 제거)
+  → 새 종료 완료 화면 `/app/assets/[id]/ended`. 종료된 자산은 목록·정산 현황에 "종료됨", 요약에 실제 종료 방식.
+- 정산: 하단 "요약 보기"·"저장하기"(자산 목록으로 이동, 매각가 없으면 비활성), 매각가 `autoComplete="off"`.
+라벨·조사·종료 판정 헬퍼는 `src/lib/labels.ts`.
+
 ## Working Rules
 - Read relevant files before suggesting changes.
 - Explain the plan before editing files.

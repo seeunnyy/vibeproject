@@ -20,6 +20,7 @@ export interface NumberInputProps {
   unit?: string;
   align?: "left" | "right";
   className?: string;
+  autoComplete?: string;
   "aria-describedby"?: string;
 }
 

@@ -1,6 +1,7 @@
 import { EMPTY_STORE, STORAGE_KEY, type StoreSchema } from "@/lib/storage/schema";
 import type { Asset, ContributionCheck, CostTotalRow, ShareRow, SettlementResult } from "@/lib/types";
 import { won } from "@/lib/calc/format";
+import { TERMINATION_LABEL } from "@/lib/labels";
 
 // 출처: planning/md-design/04_TECHNICAL_DESIGN.md §6
 // 근거: openspec specs/local-persistence/spec.md
@@ -121,9 +122,12 @@ export function toSummaryText(
   }
   lines.push("");
 
-  lines.push("종료 규칙: 매각");
+  lines.push(`종료 규칙: ${TERMINATION_LABEL[asset.termination.kind]}`);
+  if (asset.endedAt) lines.push(`종료일: ${asset.endedAt}`);
   if (asset.terminationNote) lines.push(`종료 합의 메모: ${asset.terminationNote}`);
-  if (derived.settlement) {
+  if (asset.termination.kind !== "sale") {
+    lines.push("인수·폐기는 앱에서 금액을 계산하지 않습니다.");
+  } else if (derived.settlement) {
     lines.push(`매각가: ${won(derived.settlement.salePrice)}`);
     for (const row of derived.settlement.rows) {
       lines.push(`- ${memberName(row.memberId)}: + ${won(row.receive)} 받음 (${row.formula})`);

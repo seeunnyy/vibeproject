@@ -15,6 +15,18 @@ export type IconName =
   | "tab-settlements"
   | "tab-settings";
 
+// Figma는 아이콘을 어떤 크기로 놓든 선 굵기를 1.75px로 유지한다. 24px 파일을 줄여 쓰면 선이 가늘어지므로,
+// 시안에서 쓰인 크기별로 Figma가 export한 파일(<name>-<size>.svg)을 따로 받아 두고 있으면 그것을 쓴다.
+const SIZED: Partial<Record<IconName, number[]>> = {
+  alert: [14, 16],
+  check: [14, 16, 18, 26, 36],
+  "chevron-right": [18],
+  "chevron-down": [20],
+  plus: [18],
+  "arrow-left": [20],
+  close: [20],
+};
+
 export interface IconProps {
   name: IconName;
   size?: number;
@@ -22,7 +34,8 @@ export interface IconProps {
 }
 
 export function Icon({ name, size = 24, className = "" }: IconProps) {
-  const url = `url(/icons/${name}.svg)`;
+  const file = SIZED[name]?.includes(size) ? `${name}-${size}` : name;
+  const url = `url(/icons/${file}.svg)`;
   return (
     <span
       aria-hidden="true"

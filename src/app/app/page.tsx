@@ -7,7 +7,7 @@ import { Banner } from "@/components/Banner";
 import { EmptyState } from "@/components/EmptyState";
 import { Fab } from "@/components/Fab";
 import { Icon } from "@/components/Icon";
-import { ContributionDiffNote, StatusBadge } from "@/components/StatusBadge";
+import { StatusBadge } from "@/components/StatusBadge";
 import { useAssetStore } from "@/lib/state/AssetStoreProvider";
 import { won } from "@/lib/calc/format";
 import type { Asset } from "@/lib/types";
@@ -21,7 +21,7 @@ export default function AssetListPage() {
 
   return (
     <>
-      <LargeHeader title="자산 목록" caption={mounted ? `함께 산 물건 ${assets.length}개` : undefined} />
+      <LargeHeader title="자산 목록" />
       <main className="flex flex-1 flex-col gap-3 px-5 pt-3 pb-2">
         {loadError && (
           <Banner
@@ -66,7 +66,6 @@ function AssetCard({ asset }: { asset: Asset }) {
       <p className="text-[13px] leading-[18px] text-text-muted tabular-nums">
         참여자 {asset.members.length}명 · 총 {won(asset.totalAmount)}
       </p>
-      <ContributionDiffNote asset={asset} />
       <div className="flex items-center justify-between">
         <AvatarGroup names={asset.members.map((m) => m.name)} />
         <span className="flex items-center gap-0.5 text-[13px] leading-[18px] text-text-muted">

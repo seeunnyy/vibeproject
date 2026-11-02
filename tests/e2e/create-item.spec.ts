@@ -69,11 +69,10 @@ test.describe("전체 흐름", () => {
     // S3 자산 상세
     await expect(page).toHaveURL(/\/app\/assets\/[^/]+$/);
     await expect(page.getByRole("heading", { name: "공용 냉장고" })).toBeVisible();
-    await expect(page.getByText("납부액 합계가 총 구매금액과 일치합니다")).toBeVisible();
-    await expect(page.getByText("관리자 지민")).toBeVisible();
+    await expect(page.getByLabel("관리자")).toHaveValue(/.+/);
 
     // S4 비용 기록 (2건)
-    await page.getByRole("link", { name: "비용 기록" }).click();
+    await page.getByRole("link", { name: /^비용 기록/ }).click();
     await expect(page).toHaveURL(/\/costs$/);
 
     await page.getByLabel("금액").fill("20000");
@@ -90,7 +89,7 @@ test.describe("전체 흐름", () => {
 
     // S5 종료 규칙
     await page.goBack();
-    await page.getByRole("link", { name: "종료·정산", exact: true }).click();
+    await page.getByRole("link", { name: /^종료·정산/ }).click();
     await expect(page).toHaveURL(/\/termination$/);
     await expect(page.getByRole("radio", { name: /^매각/ })).toBeChecked();
     await page.getByLabel("종료 합의 메모").fill("평가액은 당근마켓 시세 기준");
@@ -98,12 +97,15 @@ test.describe("전체 흐름", () => {
 
     // S6 정산
     await expect(page).toHaveURL(/\/settlement$/);
+    await expect(page.getByRole("button", { name: "저장하기" })).toBeDisabled();
+    await expect(page.getByLabel("매각가")).toHaveAttribute("autocomplete", "off");
     await page.getByLabel("매각가").fill("1200000");
+    await expect(page.getByRole("button", { name: "저장하기" })).toBeEnabled();
     await expect(page.getByText("받을 금액 합계")).toBeVisible();
     await expect(page.getByText("600,000원")).toBeVisible(); // 지민: 1,200,000 × 50.0%
 
     // S7 요약
-    await page.getByRole("link", { name: "요약 보기" }).click();
+    await page.getByRole("link", { name: "요약 보기", exact: true }).click();
     await expect(page).toHaveURL(/\/summary$/);
     await expect(page.getByText("종료 규칙", { exact: true })).toBeVisible();
     await page.getByRole("button", { name: "요약 복사" }).click();
@@ -117,5 +119,35 @@ test.describe("전체 흐름", () => {
     await page.goto("/app");
     await expect(page.getByText("공용 냉장고")).toBeVisible();
     await expect(page.getByText("참여자 3명")).toBeVisible();
+  });
+
+  test("인수로 종료 → 종료 완료 → 목록·정산 현황에 종료됨", async ({ page }) => {
+    await page.goto("/app/assets/new");
+    await page.getByLabel("물건명").fill("캠핑 의자 세트");
+    await page.getByLabel("총 구매금액").fill("150000");
+    await page.getByPlaceholder("참여자 1 이름").fill("이서연");
+    await page.getByPlaceholder("참여자 2 이름").fill("박하늘");
+    await page.getByLabel("이서연 납부액").fill("75000");
+    await page.getByLabel("박하늘 납부액").fill("75000");
+    await page.getByRole("button", { name: "자산 만들기" }).click();
+
+    await page.getByRole("link", { name: /^종료·정산/ }).click();
+    await page.getByText("한 명의 인수", { exact: true }).click();
+    await expect(page.getByRole("radio", { name: /^한 명의 인수/ })).toBeChecked();
+    await page.getByRole("button", { name: "공동소유 종료하기" }).click();
+
+    await expect(page).toHaveURL(/\/ended$/);
+    await expect(page.getByRole("heading", { name: "공동소유를 종료했어요" })).toBeVisible();
+    await expect(page.getByText("캠핑 의자 세트를 한 명의 인수로 정리했어요.")).toBeVisible();
+
+    await page.getByRole("link", { name: "공유 요약 보기" }).click();
+    await expect(page.getByText("한 명의 인수", { exact: true })).toBeVisible();
+    await expect(page.getByText("정산 결과")).toHaveCount(0);
+
+    await page.goto("/app");
+    await expect(page.getByText("종료됨")).toBeVisible();
+    await page.goto("/app/settlements");
+    await expect(page.getByText(/한 명의 인수로 종료 · \d{4}-\d{2}-\d{2}/)).toBeVisible();
+    await expect(page.getByRole("link", { name: "요약 보기" })).toBeVisible();
   });
 });

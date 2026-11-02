@@ -37,9 +37,23 @@ export function ButtonLink({ variant = "primary", className = "", ...rest }: But
 // 화면 하단 고정 액션 바(Figma "bottom-bar": 상단 구분선, 위 13px · 아래 28px 여백 안에 52px 버튼).
 // Session 6 구조 그대로 — 바깥 문서는 스크롤되지 않고 430px 카드 안쪽이 스크롤되므로,
 // 그 스크롤 컨테이너 기준 sticky bottom-0으로 붙는다.
-export function BottomBar({ children }: { children: React.ReactNode }) {
+// row: 버튼 두 개를 같은 폭으로 나란히(Figma 06 정산: 위 12px · 사이 8px).
+// borderless: 위 구분선 없음(Figma 10·11 종료 완료: 버튼 두 개를 세로로).
+export function BottomBar({
+  children,
+  row = false,
+  borderless = false,
+}: {
+  children: React.ReactNode;
+  row?: boolean;
+  borderless?: boolean;
+}) {
   return (
-    <div className="sticky bottom-0 z-10 flex shrink-0 flex-col gap-2 border-t border-border bg-surface px-5 pt-[13px] pb-7">
+    <div
+      className={`sticky bottom-0 z-10 flex shrink-0 gap-2 bg-surface px-5 pb-7 ${
+        row ? "flex-row pt-3 *:flex-1" : borderless ? "flex-col pt-3" : "flex-col pt-[13px]"
+      } ${borderless ? "" : "border-t border-border"}`}
+    >
       {children}
     </div>
   );

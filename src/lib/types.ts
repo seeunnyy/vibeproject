@@ -26,11 +26,11 @@ export interface CostEntry {
   memo?: string;
 }
 
-// MVP는 'sale'만 사용. buyout·disposal은 다음 버전(02 부록 A)
-export type TerminationRule =
-  | { kind: "sale" }
-  | { kind: "buyout"; buyerId: string } // 다음 버전
-  | { kind: "disposal" }; // 다음 버전
+// sale만 정산 계산(매각가 × 지분율)이 있다. buyout·disposal은 계산 없이 "어떻게 끝냈는지"와
+// 종료일(Asset.endedAt)만 기록한다 — 인수자 선택·인수 금액 계산은 하지 않는다(Session 10 결정).
+export type TerminationKind = "sale" | "buyout" | "disposal";
+
+export type TerminationRule = { kind: TerminationKind };
 
 export interface Asset {
   id: string;
@@ -43,7 +43,8 @@ export interface Asset {
   agreementNote?: string; // 구매 시 합의 메모, 선택
   terminationNote?: string; // 종료 관련 합의 메모, 선택
   costs: CostEntry[];
-  termination: TerminationRule; // MVP: { kind: 'sale' } 고정
+  termination: TerminationRule; // 기본 { kind: 'sale' }
+  endedAt?: string; // ISO yyyy-mm-dd. 인수·폐기로 공동소유를 종료한 날. sale이면 없음
   salePrice?: number; // 매각가
   status: AssetStatus;
   createdAt: string;

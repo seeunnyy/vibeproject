@@ -270,7 +270,7 @@ export default function NewAssetPage() {
 
           <section className="flex flex-col gap-4">
             <SectionHeader title="추가 정보 (선택)" />
-            <FormField label="관리자" htmlFor="asset-manager" hint="자산을 실제로 보관·관리할 참여자 (선택)">
+            <FormField label="관리자" htmlFor="asset-manager">
               <Select id="asset-manager" value={managerTempId} onChange={(e) => setManagerTempId(e.target.value)}>
                 <option value="">없음</option>
                 {members
@@ -283,10 +283,10 @@ export default function NewAssetPage() {
               </Select>
             </FormField>
 
-            <FormField label="합의 메모" htmlFor="asset-agreement-note" hint="구매 시 합의한 내용 (선택)">
+            <FormField label="합의 메모" htmlFor="asset-agreement-note">
               <textarea
                 id="asset-agreement-note"
-                className={textareaClassName}
+                className={`${textareaClassName} mt-2`}
                 value={agreementNote}
                 onChange={(e) => setAgreementNote(e.target.value)}
               />
@@ -295,12 +295,6 @@ export default function NewAssetPage() {
         </main>
 
         <BottomBar>
-          {!canSubmit && (
-            <p className="text-center text-xs leading-4 text-text-muted">
-              물건명, 총 구매금액(0보다 큼), 참여자 2명 이상{splitMode === "contribution" ? ", 전원의 납부액" : ""}을
-              입력하면 만들 수 있어요.
-            </p>
-          )}
           <Button type="submit" disabled={!canSubmit}>
             자산 만들기
           </Button>

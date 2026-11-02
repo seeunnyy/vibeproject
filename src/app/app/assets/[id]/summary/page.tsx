@@ -3,6 +3,7 @@
 import { use, useMemo, useState } from "react";
 import Link from "next/link";
 import { AppHeader } from "@/components/AppHeader";
+import { StatusScreen } from "@/components/StatusScreen";
 import { BottomBar, Button } from "@/components/Button";
 import { SectionHeader } from "@/components/Section";
 import { MemberTable, type MemberTableRow } from "@/components/MemberTable";
@@ -13,6 +14,7 @@ import { sumCostsByPayer } from "@/lib/calc/costs";
 import { computeSaleSettlement } from "@/lib/calc/settlement";
 import { toSummaryText } from "@/lib/storage/assetStore";
 import { won } from "@/lib/calc/format";
+import { TERMINATION_LABEL } from "@/lib/labels";
 
 const COST_TYPE_LABEL: Record<string, string> = {
   repair: "수리비",
@@ -42,12 +44,7 @@ export default function SummaryPage({ params }: { params: Promise<{ id: string }
     return (
       <>
         <AppHeader title="공유 요약" backHref="/app" />
-        <main className="flex flex-1 flex-col items-center justify-center gap-3 px-4 py-10 text-center">
-          <p className="text-sm text-text-muted">해당 자산을 찾을 수 없어요.</p>
-          <Link href="/app" className="text-sm text-primary-strong underline">
-            목록으로 돌아가기
-          </Link>
-        </main>
+        <StatusScreen message="해당 자산을 찾을 수 없어요." actionLabel="목록으로 돌아가기" href="/app" />
       </>
     );
   }
@@ -90,8 +87,10 @@ export default function SummaryPage({ params }: { params: Promise<{ id: string }
     ...(asset.purchaseDate ? [{ label: "구매일", value: asset.purchaseDate }] : []),
     { label: "총 구매금액", value: won(asset.totalAmount) },
     { label: "관리자", value: manager ? manager.name : "미지정" },
-    { label: "종료 규칙", value: "매각" },
+    { label: "종료 규칙", value: TERMINATION_LABEL[asset.termination.kind] },
+    ...(asset.endedAt ? [{ label: "종료일", value: asset.endedAt }] : []),
   ];
+  const isSale = asset.termination.kind === "sale";
 
   return (
     <>
@@ -125,7 +124,7 @@ export default function SummaryPage({ params }: { params: Promise<{ id: string }
 
         <section className="flex flex-col gap-3">
           <SectionHeader title="참여자·지분" aside={`${asset.members.length}명`} />
-          <MemberTable rows={rows} grouped />
+          <MemberTable rows={rows} grouped showManager={false} />
         </section>
 
         <section className="flex flex-col gap-3">
@@ -149,22 +148,25 @@ export default function SummaryPage({ params }: { params: Promise<{ id: string }
           )}
         </section>
 
-        <section className="flex flex-col gap-3">
-          <SectionHeader
-            title="정산 결과"
-            aside={settlement ? `매각가 ${won(settlement.salePrice)}` : undefined}
-          />
-          {settlement ? (
-            <SettlementResult result={settlement} members={asset.members} title="" />
-          ) : (
-            <Link
-              href={`/app/assets/${asset.id}/settlement`}
-              className="flex min-h-11 items-center gap-0.5 self-start text-sm leading-5 font-medium text-primary-strong"
-            >
-              매각가를 입력하면 정산 결과가 표시됩니다
-            </Link>
-          )}
-        </section>
+        {/* 인수·폐기는 앱에서 금액을 계산하지 않으므로 정산 결과 섹션을 두지 않는다. */}
+        {isSale && (
+          <section className="flex flex-col gap-3">
+            <SectionHeader
+              title="정산 결과"
+              aside={settlement ? `매각가 ${won(settlement.salePrice)}` : undefined}
+            />
+            {settlement ? (
+              <SettlementResult result={settlement} members={asset.members} title="" checkGap="gap-3" />
+            ) : (
+              <Link
+                href={`/app/assets/${asset.id}/settlement`}
+                className="flex min-h-11 items-center gap-0.5 self-start text-sm leading-5 font-medium text-primary-strong"
+              >
+                매각가를 입력하면 정산 결과가 표시됩니다
+              </Link>
+            )}
+          </section>
+        )}
       </main>
       <BottomBar>
         {copied && (
