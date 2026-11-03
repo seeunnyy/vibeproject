@@ -19,7 +19,7 @@ function makeAsset(overrides: Partial<Asset>): Asset {
 }
 
 describe("computeShares", () => {
-  it("납부액 비율 50/30/20 → 지분율 50.0/33.3/16.7, 합계 100.0", () => {
+  it("납부액 비율 50/33.3/16.7 → 반올림하지 않은 비율을 그대로 반환", () => {
     const asset = makeAsset({
       totalAmount: 900000,
       members: [
@@ -29,11 +29,11 @@ describe("computeShares", () => {
       ],
     });
     const rows = computeShares(asset);
-    expect(rows.map((r) => r.sharePct)).toEqual([50, 33.3, 16.7]);
+    expect(rows.map((r) => r.sharePct.toFixed(1))).toEqual(["50.0", "33.3", "16.7"]);
     expect(rows.reduce((sum, r) => sum + r.sharePct, 0)).toBeCloseTo(100, 5);
   });
 
-  it("1/3씩 균등 납부 → 33.4/33.3/33.3, 합계 100.0", () => {
+  it("1/3씩 균등 납부 → 표시 33.3/33.3/33.3 (보정 없음)", () => {
     const asset = makeAsset({
       totalAmount: 900000,
       members: [
@@ -43,10 +43,10 @@ describe("computeShares", () => {
       ],
     });
     const rows = computeShares(asset);
-    expect(rows.map((r) => r.sharePct)).toEqual([33.4, 33.3, 33.3]);
+    expect(rows.map((r) => r.sharePct.toFixed(1))).toEqual(["33.3", "33.3", "33.3"]);
   });
 
-  it("균등 분할 3인 → 33.4/33.3/33.3, 합계 100.0 (잔여는 첫 참여자)", () => {
+  it("균등 분할 3인 → 표시 33.3/33.3/33.3", () => {
     const asset = makeAsset({
       splitMode: "equal",
       members: [
@@ -56,8 +56,19 @@ describe("computeShares", () => {
       ],
     });
     const rows = computeShares(asset);
-    expect(rows.map((r) => r.sharePct)).toEqual([33.4, 33.3, 33.3]);
+    expect(rows.map((r) => r.sharePct.toFixed(1))).toEqual(["33.3", "33.3", "33.3"]);
     expect(rows[0].formula).toBe("100 ÷ 3");
+  });
+
+  it("400,000/300,000/200,000 → 표시 44.4/33.3/22.2 (화면 표시 때만 반올림)", () => {
+    const asset = makeAsset({
+      members: [
+        { id: "m1", name: "A", contribution: 400000 },
+        { id: "m2", name: "B", contribution: 300000 },
+        { id: "m3", name: "C", contribution: 200000 },
+      ],
+    });
+    expect(computeShares(asset).map((r) => r.sharePct.toFixed(1))).toEqual(["44.4", "33.3", "22.2"]);
   });
 
   it("참여자가 없으면 빈 배열", () => {

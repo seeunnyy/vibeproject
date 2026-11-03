@@ -34,8 +34,9 @@ export function checkContribution(asset: Asset): ContributionCheck {
 // 근거: specs/asset-registration/spec.md "Requirement: 지분율 자동 산출"
 // 02_REQUIREMENTS_SPEC.md R-1, R-2. 04_TECHNICAL_DESIGN.md §7 computeShares.
 //
-// 소수 첫째 자리까지 반올림하되, 정수(십분위) 단위로 계산해 부동소수 오차를 피하고
-// 반올림 잔여를 규칙대로 한 참여자에게 몰아줘 합계가 항상 100.0%가 되게 한다.
+// sharePct는 반올림하지 않은 원래 비율(예: 44.444…)이다. 소수 첫째 자리 반올림은 화면에 표시할 때만
+// (`percent()` / `toFixed(1)`) 한다. 그래서 표시값 합계가 99.9%처럼 100.0%와 조금 다를 수 있지만,
+// 정산 금액은 이 반올림 값이 아니라 원래 금액 비율로 계산한다(settlement.ts).
 export function computeShares(asset: Asset): ShareRow[] {
   const { members, splitMode } = asset;
   if (members.length === 0) return [];
@@ -49,36 +50,13 @@ export function computeShares(asset: Asset): ShareRow[] {
     return members.map((m) => ({ memberId: m.id, sharePct: 0, formula: `0 ÷ 0` }));
   }
 
-  // 십분위(0.1% 단위) 정수로 반올림해 계산 → 합계 오차를 정수 연산으로 다룬다.
-  const tenths = members.map((m) => {
-    const raw = isEqual ? 1000 / members.length : (m.contribution / contributionSum) * 1000;
-    return Math.round(raw);
-  });
-
-  const sumTenths = tenths.reduce((a, b) => a + b, 0);
-  const remainder = 1000 - sumTenths;
-
-  if (remainder !== 0) {
-    // R-1/R-2: 균등이면 첫 참여자, 납부액 모드면 납부액이 가장 큰 참여자에게 잔여 배분.
-    const targetIndex = isEqual ? 0 : indexOfMax(members.map((m) => m.contribution));
-    tenths[targetIndex] += remainder;
-  }
-
-  return members.map((m, i) => {
-    const sharePct = tenths[i] / 10;
+  return members.map((m) => {
+    const sharePct = isEqual ? 100 / members.length : (m.contribution / contributionSum) * 100;
     const formula = isEqual
       ? `100 ÷ ${members.length}`
       : `${comma(m.contribution)} ÷ ${comma(contributionSum)}`;
     return { memberId: m.id, sharePct, formula };
   });
-}
-
-function indexOfMax(values: number[]): number {
-  let best = 0;
-  for (let i = 1; i < values.length; i += 1) {
-    if (values[i] > values[best]) best = i;
-  }
-  return best;
 }
 
 // 균등 분할 자산의 참여자별 부담액. 균등 모드는 납부액을 0으로 저장하므로, 화면·요약에 "얼마를 부담하는지"를

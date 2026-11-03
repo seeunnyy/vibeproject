@@ -23,7 +23,7 @@ import { TERMINATION_LABEL, isEnded, withJosa } from "@/lib/labels";
 // S3 자산 상세 — 출처: planning/md-design/03_UX_UI_SPEC.md S3
 // 근거: 02_REQUIREMENTS_SPEC.md FR-4, FR-13, R-13.
 // 참여자 추가·삭제(아래 "참여자 관리" 섹션): docs/UX_IMPROVEMENT_PROPOSAL.md #4.
-// 시각: Figma "03 자산 상세" — 구매일 + 28px 총액, 참여자 회색 카드(납부/지불, 산출식 없음) + "참여자 수정",
+// 시각: Figma "03 자산 상세" — 구매일 + 28px 총액, 참여자 회색 카드(납부/낸 비용, 산출식 없음) + "참여자 수정",
 // "다음 단계" 메뉴(비용 기록 / 종료·정산 / 요약 보기), 자산 정보, 맨 아래 "이 자산 삭제". 참여자 관리 폼은
 // "참여자 수정"을 눌렀을 때만 펼친다(시안에 없는 상태라 시안 입력칸·버튼 스타일로 구성).
 export default function AssetDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -169,7 +169,7 @@ export default function AssetDetailPage({ params }: { params: Promise<{ id: stri
         <section className="flex flex-col gap-3">
           <SectionHeader title="참여자" aside={`${asset.members.length}명`} />
           <div className="flex flex-col gap-1">
-            <MemberTable rows={rows} paidLabel="지불" showFormula={false} />
+            <MemberTable rows={rows} showFormula={false} />
             <button
               type="button"
               aria-expanded={managing}

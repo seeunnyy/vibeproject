@@ -29,10 +29,10 @@ export default function LandingPage() {
           <div className={`top-[140px] left-[104px] flex w-[230px] rotate-4 flex-col gap-1.5 whitespace-nowrap ${FLOAT_CARD}`}>
             <p className="text-[13px] leading-[18px] font-medium text-text-muted">정산 결과</p>
             <p className="flex items-center gap-1.5">
-              <span className="text-xl leading-7 font-bold tracking-[-0.01em] text-primary">+ 200,250원</span>
+              <span className="text-xl leading-7 font-bold tracking-[-0.01em] text-primary">+ 200,000원</span>
               <span className="text-[13px] leading-[18px] text-text-muted">받음</span>
             </p>
-            <p className="text-xs leading-4 text-text-muted">450,000 × 44.5%</p>
+            <p className="text-xs leading-4 text-text-muted">지분 44.4%</p>
           </div>
           <div className="absolute top-[68px] left-[260px] flex size-14 items-center justify-center rounded-full bg-surface text-primary-strong shadow-[0_10px_28px_0_rgba(20,33,61,0.1)]">
             <Icon name="check" size={26} />

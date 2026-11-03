@@ -102,7 +102,7 @@ test.describe("전체 흐름", () => {
     await page.getByLabel("매각가").fill("1200000");
     await expect(page.getByRole("button", { name: "저장하기" })).toBeEnabled();
     await expect(page.getByText("받을 금액 합계")).toBeVisible();
-    await expect(page.getByText("600,000원")).toBeVisible(); // 지민: 1,200,000 × 50.0%
+    await expect(page.getByText("600,000원")).toBeVisible(); // 지민: 납부액 비율 50% × 매각가 1,200,000
 
     // S7 요약
     await page.getByRole("link", { name: "요약 보기", exact: true }).click();

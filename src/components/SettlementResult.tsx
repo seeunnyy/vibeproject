@@ -6,7 +6,7 @@ import { won } from "@/lib/calc/format";
 
 // 출처: 03_UX_UI_SPEC.md §4 — SettlementResult (S6). 근거: R-4, R-7, FR-9, AC-9, AC-13.
 // 시각: Figma 06 "받을 금액" / 07 "정산 결과" — 파란 강조 카드 + 아래 검증 문구.
-// 받을 금액은 "+ 금액 받음"(부호 + 라벨)과 산출식 "매각가 × 지분율"을 항상 함께 보여준다.
+// 받을 금액은 "+ 금액 받음"(부호 + 라벨)과 "지분 44.4%" 같은 지분율 표시를 항상 함께 보여준다.
 export function SettlementResult({
   result,
   members,
