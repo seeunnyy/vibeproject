@@ -2,21 +2,17 @@
 
 import { LargeHeader } from "@/components/AppHeader";
 import { Button } from "@/components/Button";
-import { SectionHeader } from "@/components/Section";
-import { StepTimeline } from "@/components/StepTimeline";
+import { Icon, type IconName } from "@/components/Icon";
 import { useAssetStore } from "@/lib/state/AssetStoreProvider";
 
-// 설정 — 데이터 초기화 및 앱 정보 (탭바 3번째 탭).
-// 시각: Figma "09 설정" — 큰 제목, 번호 레일 이용 방법,
-// 흰 테두리 pill의 빨간 "모든 데이터 초기화", 앱 정보 텍스트. 섹션 간격 36px.
+// 설정 — 이용 방법 안내 + 데이터 초기화 (탭바 3번째 탭).
+// 시각: Figma "09 설정"(node 2187:1152) — 큰 제목, "우리몫 이용 방법" 아래 회색 카드 2장(01 자산 등록 · 02 공동 관리,
+// 번호는 제목 앞에 붙임) + 파란 강조 카드(03 지분대로 정산), 화면 아래쪽 탭바 위에 흰 테두리 "데이터 초기화" 버튼만.
 // 결제·인증 등 MVP 범위를 벗어나는 기능은 추가하지 않는다(CLAUDE.md Boundaries).
-const GUIDE_STEPS = [
-  { title: "공동구매 시작", desc: "함께 산 물건을 자산으로 등록하고 참여자를 정해요." },
-  { title: "지분 확인", desc: "납부액 또는 균등 분할로 각자의 지분율을 계산해요." },
-  { title: "공동비용 기록", desc: "수리비·배송비 등 추가로 든 비용을 누가 냈는지 기록해요." },
-  { title: "종료 규칙 합의", desc: "공동소유를 끝낼 때 어떻게 정리할지 미리 정해요." },
-  { title: "정산", desc: "매각가를 입력하면 지분율대로 받을 금액을 계산해요." },
-] as const;
+const GUIDE_CARDS: { icon: IconName; title: string; desc: string }[] = [
+  { icon: "tab-assets", title: "01 자산 등록", desc: "참여자·지분 설정" },
+  { icon: "tab-settings", title: "02 공동 관리", desc: "비용·종료 규칙 기록" },
+];
 
 export default function SettingsPage() {
   const { resetStore } = useAssetStore();
@@ -30,29 +26,44 @@ export default function SettingsPage() {
   return (
     <>
       <LargeHeader title="설정" />
-      <main className="flex flex-1 flex-col gap-9 px-5 pt-3 pb-8">
+      {/* 시안 content: 위 20px · 아래 24px · 좌우 20px. 데이터 초기화는 여유 공간(flex-1) 뒤 맨 아래에 놓이고,
+          시안의 데이터 카드 안쪽 16px 여백만큼 더 들여 화면 끝에서 좌우 36px · 탭바까지 40px. */}
+      <main className="flex flex-1 flex-col px-5 pt-5 pb-6">
         <section className="flex flex-col gap-4">
-          <SectionHeader title="우리몫 이용 방법" />
-          <StepTimeline steps={GUIDE_STEPS} />
+          <h2 className="text-base leading-6 font-bold tracking-[-0.01em] text-primary">우리몫 이용 방법</h2>
+          <div className="flex h-40 gap-4">
+            {GUIDE_CARDS.map((card) => (
+              <div key={card.title} className="flex min-w-0 flex-1 flex-col gap-[18px] rounded-[20px] bg-surface-muted p-4">
+                <div className="flex size-10 items-center justify-center rounded-xl bg-surface text-primary-strong">
+                  <Icon name={card.icon} />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <h3 className="text-base leading-6 font-bold tracking-[-0.01em] text-primary">{card.title}</h3>
+                  <p className="text-[13px] leading-[18px] text-text-muted">{card.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="flex h-[88px] items-center gap-3.5 rounded-[20px] bg-primary-soft px-4">
+            <div className="flex size-11 shrink-0 items-center justify-center rounded-[14px] bg-surface text-primary-strong">
+              <Icon name="tab-settlements" />
+            </div>
+            <div className="flex min-w-0 flex-1 flex-col gap-1">
+              <h3 className="text-base leading-6 font-bold tracking-[-0.01em] whitespace-pre-wrap text-primary-strong">
+                {"03  지분대로 정산"}
+              </h3>
+              <p className="text-[13px] leading-[18px] text-text-muted">매각가 입력 → 내 몫 자동 계산</p>
+            </div>
+          </div>
         </section>
 
-        <section className="flex flex-col gap-2.5">
-          <SectionHeader title="데이터" />
-          <Button variant="danger" onClick={handleReset}>
-            모든 데이터 초기화
+        <div className="min-h-10 flex-1" aria-hidden="true" />
+
+        <div className="px-4 pb-4">
+          <Button variant="danger" onClick={handleReset} className="min-h-12! w-full rounded-xl!">
+            데이터 초기화
           </Button>
-          <p className="text-[13px] leading-[18px] text-text-muted">
-            이 기기의 브라우저에 저장된 모든 자산·비용 기록을 삭제해요.
-          </p>
-        </section>
-
-        <section className="flex flex-col gap-1.5">
-          <SectionHeader title="앱 정보" />
-          <p className="text-[13px] leading-[18px] text-text-muted">
-            우리몫 · 공동소유 자산의 지분·비용을 기록하고 정산하는 서비스
-          </p>
-          <p className="text-[13px] leading-[18px] text-text-muted">모든 데이터는 서버가 아닌 이 브라우저에만 저장돼요.</p>
-        </section>
+        </div>
       </main>
     </>
   );
